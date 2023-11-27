@@ -1,0 +1,3 @@
+[submodule "latoken-api-v2-dotnet-client"]
+	path = latoken-api-v2-dotnet-client
+	url = https://github.com/citsuresh/latoken-api-v2-dotnet-client.git

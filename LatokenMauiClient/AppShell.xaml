@@ -5,11 +5,21 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:LatokenMauiClient"
     Shell.FlyoutBehavior="Disabled"
+    Loaded="Shell_Loaded"
     Title="LatokenMauiClient">
-
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <FlyoutItem Route="pages">
+        <ShellContent Title="Profile"
+                      Route="profile" 
+                      ContentTemplate="{DataTemplate local:ProfilePage}" />
+        <ShellContent Title="Trading Competitions" 
+                      Route="tradingCompetitions" 
+                      ContentTemplate="{DataTemplate local:TradingCompetitionsPage}" />
+        <ShellContent Title="Wallet Balances" 
+                      Route="wallet" 
+                      ContentTemplate="{DataTemplate local:WalletPage}"  />
+        <ShellContent Title="Spot Balances" 
+                      Route="spot" 
+                      ContentTemplate="{DataTemplate local:SpotPage}" />
+    </FlyoutItem>
 
 </Shell>
