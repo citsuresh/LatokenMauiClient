@@ -41,6 +41,8 @@ namespace LatokenMauiClient
             builder.Services.AddTransient<TradingCompetitionsViewModel>();
             builder.Services.AddTransient<ICurrencyCache, LatokenCurrencyCache>();
 
+            builder.Services.AddSingleton<IAlertService, AlertService>();
+
             return builder.Build();
         }
     }

@@ -69,6 +69,8 @@ namespace LatokenMauiClient
                     Preferences.Default.Set<string>("ProfileName", this.ProfileName);
                     Preferences.Default.Set<string>("ApiKey", this.ApiKey);
                     Preferences.Default.Set<string>("ApiSecret", this.ApiSecret);
+
+                    App.AlertSvc.ShowAlert("Success", "Profile has been saved locally.", "OK");
                 }
             }
         }
