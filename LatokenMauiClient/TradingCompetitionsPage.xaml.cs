@@ -13,7 +13,7 @@
         }
 
 
-        private async void ContentPage_Loaded(object sender, EventArgs e)
+        private void ContentPage_Loaded(object sender, EventArgs e)
         {
             if (this.isFirstVisit)
             {
