@@ -1,65 +1,28 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace LatokenMauiClient
 {
-    public class ProfilePageViewModel : INotifyPropertyChanged
+    public partial class ProfilePageViewModel : ObservableObject
     {
         public ProfilePageViewModel()
         {
             this.ProfileName = Preferences.Default.Get<string>("ProfileName", string.Empty);
             this.ApiKey = Preferences.Default.Get<string>("ApiKey", string.Empty);
             this.ApiSecret = Preferences.Default.Get<string>("ApiSecret", string.Empty);
-
-            SaveCommand = new Command(() => ExecuteSave(), () => true);
         }
 
-        public string ProfileName
-        {
-            get
-            {
-                return profileName;
-            }
+        [ObservableProperty]
+        private string profileName;
 
-            set
-            {
-                profileName = value;
-                this.OnPropertyChanged();
-            }
-        }
+        [ObservableProperty]
+        private string apiSecret;
 
-        public string ApiKey
-        {
-            get
-            {
-                return apiKey;
-            }
+        [ObservableProperty]
+        private string apiKey;
 
-            set
-            {
-                apiKey = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public string ApiSecret
-        {
-            get
-            {
-                return apiSecret;
-            }
-
-            set
-            {
-                apiSecret = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        private void ExecuteSave()
+        [RelayCommand]
+        private void Save()
         {
             if (!string.IsNullOrWhiteSpace(this.ApiKey) && !string.IsNullOrWhiteSpace(this.ApiSecret))
             {
@@ -74,18 +37,5 @@ namespace LatokenMauiClient
                 }
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-
-        private string profileName;
-        private string apiSecret;
-        private string apiKey;
-
-        public ICommand SaveCommand { get; private set; }
-
-
-        public void OnPropertyChanged([CallerMemberName] string name = "") =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
