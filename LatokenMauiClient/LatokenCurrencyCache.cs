@@ -1,5 +1,4 @@
-﻿
-namespace LatokenMauiClient
+﻿namespace LatokenMauiClient
 {
     internal class LatokenCurrencyCache : ICurrencyCache
     {

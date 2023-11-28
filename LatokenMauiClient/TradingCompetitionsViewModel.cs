@@ -6,13 +6,13 @@ namespace LatokenMauiClient
 {
     public partial class TradingCompetitionsViewModel : ObservableObject
     {
-        private UserProfile UserProfile { get; } = null;
-        private LatokenRestClient RestClient { get; set; }
-        private ICurrencyCache CurrencyCache { get; set; }
+        private UserProfile userProfile;
+        private LatokenRestClient restClient;
+        private ICurrencyCache currencyCache;
 
         public TradingCompetitionsViewModel(ICurrencyCache currencyCache)
         {
-            this.CurrencyCache = currencyCache;
+            this.currencyCache = currencyCache;
             var profileName = Preferences.Default.Get<string>("ProfileName", string.Empty);
             var apiKey = Preferences.Default.Get<string>("ApiKey", string.Empty);
             var apiSecret = Preferences.Default.Get<string>("ApiSecret", string.Empty);
@@ -21,16 +21,16 @@ namespace LatokenMauiClient
                 !string.IsNullOrEmpty(apiKey) &&
                 !string.IsNullOrEmpty(apiSecret))
             {
-                this.UserProfile = new UserProfile { ProfileName = profileName, ApiKey = apiKey, ApiSecret = apiSecret };
-                this.RestClient = new LatokenRestClient(this.UserProfile.ApiKey, this.UserProfile.ApiSecret);
+                this.userProfile = new UserProfile { ProfileName = profileName, ApiKey = apiKey, ApiSecret = apiSecret };
+                this.restClient = new LatokenRestClient(this.userProfile.ApiKey, this.userProfile.ApiSecret);
             }
         }
 
         public IEnumerable<TradingCompetitionData> GetTradingCompetitions()
         {
-            if (this.RestClient != null && this.CurrencyCache != null)
+            if (this.restClient != null && this.currencyCache != null)
             {
-                var competitions = this.RestClient.GetTradingCompetitions().OrderBy(c => c.EndDate);
+                var competitions = this.restClient.GetTradingCompetitions().OrderBy(c => c.EndDate);
 
                 foreach (var competition in competitions)
                 {
@@ -46,7 +46,7 @@ namespace LatokenMauiClient
                         CurrencyId = competition.CurrencyId,
                         StartDate = DateTimeOffset.FromUnixTimeMilliseconds(competition.StartDate).DateTime,
                         EndDate = DateTimeOffset.FromUnixTimeMilliseconds(competition.EndDate).DateTime,
-                        Symbol = this.CurrencyCache.AvailableCurrencies.FirstOrDefault(c => c.Id == competition.CurrencyId)?.Symbol,
+                        Symbol = this.currencyCache.AvailableCurrencies.FirstOrDefault(c => c.Id == competition.CurrencyId)?.Symbol,
                         TargetDisplay = competition.Target.Replace("TRADING_COMPETITION_TARGET_", string.Empty).Replace("_PLUS_", " + "),
                         BudgetSplitDisplay = competition.BudgetSplit?.Replace("TRADING_COMPETITION_BUDGET_SPLIT_", string.Empty),
                         StatusDisplay = competition.Status.Replace("TRADING_COMPETITION_STATUS_", string.Empty),
@@ -58,9 +58,9 @@ namespace LatokenMauiClient
 
         public TradingCompetitionUserPosition GetUserPositionForTradingCompetition(TradingCompetitionData competition)
         {
-            if (RestClient != null)
+            if (restClient != null)
             {
-                return this.RestClient.GetUserPositionForTradingCompetition(competition.Id);
+                return this.restClient.GetUserPositionForTradingCompetition(competition.Id);
             }
 
             return null;

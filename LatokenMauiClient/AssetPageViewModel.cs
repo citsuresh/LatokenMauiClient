@@ -1,21 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Extensions.Configuration;
-using System.ComponentModel;
 using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
 
 namespace LatokenMauiClient
 {
     public partial class AssetPageViewModel : ObservableObject
     {
-        private UserProfile UserProfile { get; } = null;
-        private LatokenRestClient RestClient { get; set; }
+        private UserProfile userProfile;
+        private LatokenRestClient restClient;
+        private ICurrencyCache currencyCache;
 
-        private IEnumerable<CurrencyDto> currencies = new CurrencyDto[0];
-
-        public AssetPageViewModel()
+        public AssetPageViewModel(ICurrencyCache currencyCache)
         {
+            this.currencyCache = currencyCache;
             var profileName = Preferences.Default.Get<string>("ProfileName", string.Empty);
             var apiKey = Preferences.Default.Get<string>("ApiKey", string.Empty);
             var apiSecret = Preferences.Default.Get<string>("ApiSecret", string.Empty);
@@ -24,10 +20,8 @@ namespace LatokenMauiClient
                 !string.IsNullOrEmpty(apiKey) &&
                 !string.IsNullOrEmpty(apiSecret))
             {
-                this.UserProfile = new UserProfile { ProfileName = profileName, ApiKey = apiKey, ApiSecret = apiSecret };
-                this.RestClient = new LatokenRestClient(this.UserProfile.ApiKey, this.UserProfile.ApiSecret);
-                this.currencies = this.GetCurrencies();
-
+                this.userProfile = new UserProfile { ProfileName = profileName, ApiKey = apiKey, ApiSecret = apiSecret };
+                this.restClient = new LatokenRestClient(this.userProfile.ApiKey, this.userProfile.ApiSecret);
             }
         }
 
@@ -36,21 +30,22 @@ namespace LatokenMauiClient
             return this.LoadAssets("WALLET");
         }
 
-        internal IEnumerable<BalanceDto> LoadSpotAssets()
+        public IEnumerable<BalanceDto> LoadSpotAssets()
         {
             return this.LoadAssets("SPOT");
         }
 
-        public IEnumerable<BalanceDto> LoadAssets(string assetType)
+        private IEnumerable<BalanceDto> LoadAssets(string assetType)
         {
-            if (this.RestClient != null)
+            if (this.restClient != null && this.currencyCache != null)
             {
-                var allBalances = this.RestClient.GetBalances(false);
+                var allBalances = this.restClient.GetBalances(false);
                 var assetTypeBalances = allBalances.Where(b => b.Type == assetType).ToList();
+
                 //Populate the CurrencySymbol Property
                 foreach (var asset in assetTypeBalances)
                 {
-                    var currency = currencies.FirstOrDefault(a => a.Id == asset.CurrencyId);
+                    var currency = this.currencyCache.AvailableCurrencies.FirstOrDefault(a => a.Id == asset.CurrencyId);
 
                     if (currency != null)
                     {
@@ -67,17 +62,7 @@ namespace LatokenMauiClient
             return new BalanceDto[0];
         }
 
-        public IEnumerable<CurrencyDto> GetCurrencies()
-        {
-            if (this.RestClient != null)
-            {
-                return this.RestClient.GetCurrencies();
-            }
-
-            return new CurrencyDto[0];
-        }
-
-        internal decimal GetAssetValue(BalanceDto asset)
+        public decimal GetAssetValue(BalanceDto asset)
         {
             if (asset != null)
             {
@@ -86,7 +71,7 @@ namespace LatokenMauiClient
                     if (asset.CurrencySymbol != "USDT")
                     {
 
-                        var strPrice = this.RestClient.GetLastTrade(asset.CurrencySymbol, "USDT")?.Price;
+                        var strPrice = this.restClient.GetLastTrade(asset.CurrencySymbol, "USDT")?.Price;
                         decimal price;
                         if (!string.IsNullOrEmpty(strPrice) && decimal.TryParse(strPrice, out price))
                         {
