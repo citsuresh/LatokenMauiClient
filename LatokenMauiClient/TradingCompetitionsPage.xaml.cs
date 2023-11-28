@@ -5,8 +5,6 @@
         private bool isFirstVisit = true;
 
         public TradingCompetitionsViewModel ViewModel { get; set; }
-        public RowDefinition HeaderRowDefinition { get; }
-        public List<Task> Tasks { get; private set; }
 
         public TradingCompetitionsPage(TradingCompetitionsViewModel viewModel)
         {
@@ -20,7 +18,6 @@
             if (this.isFirstVisit)
             {
                 this.isFirstVisit = false;
-                this.Tasks = new List<Task>();
                 RefreshButton.Text = "Refreshing...";
                 RefreshButton.IsEnabled = false;
                 Task.Run(() => RefreshTradingCompetitions());
@@ -30,7 +27,6 @@
 
         private void RefreshButton_Clicked(object sender, EventArgs e)
         {
-            this.Tasks = new List<Task>();
             RefreshButton.Text = "Refreshing...";
             RefreshButton.IsEnabled = false;
             Task.Run(() => RefreshTradingCompetitions());
