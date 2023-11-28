@@ -14,7 +14,7 @@
                 Text="Wallet Assets"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
-                <Border BackgroundColor="LightGray">
+                <Border>
 
                     <Grid x:Name="AssetsGrid">
                         <Grid.ColumnDefinitions>
@@ -27,7 +27,7 @@
                         </Grid.RowDefinitions>
                         <Label Grid.Row="0"
                          Grid.Column="0"
-                         Text="Name"
+                         Text=" Name"
                          x:Name="NameColumnHeader"
                          Padding="4"
                          FontAttributes="Bold"/>

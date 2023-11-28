@@ -71,13 +71,13 @@ namespace LatokenMauiClient
                         nameLabel.SetValue(Grid.RowProperty, index);
                         nameLabel.SetValue(Grid.ColumnProperty, 0);
                         nameLabel.SetValue(Label.TextProperty, currency.Symbol);
-                        nameLabel.SetValue(Label.BackgroundProperty, Colors.White);
+                        nameLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
 
                         var quantityLabel = new Label();
                         quantityLabel.SetValue(Grid.RowProperty, index);
                         quantityLabel.SetValue(Grid.ColumnProperty, 1);
                         quantityLabel.SetValue(Label.TextProperty, asset.Available);
-                        quantityLabel.SetValue(Label.BackgroundProperty, Colors.White);
+                        quantityLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
 
                         var valueLabel = new Label();
                         valueLabel.SetValue(Grid.RowProperty, index);
@@ -90,7 +90,7 @@ namespace LatokenMauiClient
                         {
                             valueLabel.SetValue(Label.TextProperty, asset.Available);
                         }
-                        valueLabel.SetValue(Label.BackgroundProperty, Colors.White);
+                        valueLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
 
                         Application.Current.Dispatcher.Dispatch(() =>
                         {
@@ -120,23 +120,23 @@ namespace LatokenMauiClient
             var nameLabel = new Label();
             nameLabel.SetValue(Grid.RowProperty, 0);
             nameLabel.SetValue(Grid.ColumnProperty, 0);
-            nameLabel.SetValue(Label.TextProperty, "Name");
-            nameLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
-            //nameLabel.SetValue(Label.BackgroundProperty, Colors.White);
+            nameLabel.SetValue(Label.TextProperty, " Name");
+            nameLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
+            nameLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
 
             var quantityLabel = new Label();
             quantityLabel.SetValue(Grid.RowProperty, 0);
             quantityLabel.SetValue(Grid.ColumnProperty, 1);
             quantityLabel.SetValue(Label.TextProperty, "Quantity");
-            quantityLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
-            //quantityLabel.SetValue(Label.BackgroundProperty, Colors.White);
+            quantityLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
+            quantityLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
 
             var valueLabel = new Label();
             valueLabel.SetValue(Grid.RowProperty, 0);
             valueLabel.SetValue(Grid.ColumnProperty, 2);
             valueLabel.SetValue(Label.TextProperty, "Value");
-            valueLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
-            //valueLabel.SetValue(Label.BackgroundProperty, Colors.White);
+            valueLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
+            valueLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
 
             AssetsGrid.RowDefinitions.Add(new RowDefinition());
             AssetsGrid.Children.Add(nameLabel);

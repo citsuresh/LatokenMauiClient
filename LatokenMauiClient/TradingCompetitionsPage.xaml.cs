@@ -87,39 +87,39 @@ namespace LatokenMauiClient
                         var nameLabel = new Label();
                         nameLabel.SetValue(Grid.RowProperty, index);
                         nameLabel.SetValue(Grid.ColumnProperty, 0);
+                        nameLabel.SetValue(Grid.MarginProperty, new Thickness(5,0,0,5));
                         nameLabel.SetValue(Label.TextProperty, competitionForDisplay.Name.Replace("Trading competition", "").Trim());
-                        nameLabel.SetValue(Label.BackgroundProperty, Colors.White);
 
                         var userPositionLabel = new Label();
                         userPositionLabel.SetValue(Grid.RowProperty, index);
                         userPositionLabel.SetValue(Label.HorizontalTextAlignmentProperty, TextAlignment.Center);
                         userPositionLabel.SetValue(Grid.ColumnProperty, 1);
+                        userPositionLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
                         userPositionLabel.SetValue(Label.TextProperty, userPosition.Position);
-                        userPositionLabel.SetValue(Label.BackgroundProperty, Colors.White);
 
                         var remainingTimeLabel = new Label();
                         remainingTimeLabel.SetValue(Grid.RowProperty, index);
                         remainingTimeLabel.SetValue(Grid.ColumnProperty, 2);
+                        remainingTimeLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
                         remainingTimeLabel.SetValue(Label.TextProperty, competitionForDisplay.RemainingTime);
-                        remainingTimeLabel.SetValue(Label.BackgroundProperty, Colors.White);
 
                         var targetLabel = new Label();
                         targetLabel.SetValue(Grid.RowProperty, index);
                         targetLabel.SetValue(Grid.ColumnProperty, 3);
+                        targetLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
                         targetLabel.SetValue(Label.TextProperty, competitionForDisplay.TargetDisplay.Replace("_PLUS_", " + "));
-                        targetLabel.SetValue(Label.BackgroundProperty, Colors.White);
 
                         //var startDateLabel = new Label();
                         //startDateLabel.SetValue(Grid.RowProperty, index);
                         //startDateLabel.SetValue(Grid.ColumnProperty, 4);
+                        //startDateLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
                         //startDateLabel.SetValue(Label.TextProperty, competitionForDisplay.StartDate);
-                        //startDateLabel.SetValue(Label.BackgroundProperty, Colors.White);
 
                         //var endDateLabel = new Label();
                         //endDateLabel.SetValue(Grid.RowProperty, index);
                         //endDateLabel.SetValue(Grid.ColumnProperty, 5);
+                        //endDateLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
                         //endDateLabel.SetValue(Label.TextProperty, competitionForDisplay.EndDate);
-                        //endDateLabel.SetValue(Label.BackgroundProperty, Colors.White);
 
                         Application.Current.Dispatcher.Dispatch(() =>
                         {
@@ -151,45 +151,51 @@ namespace LatokenMauiClient
             var nameLabel = new Label();
             nameLabel.SetValue(Grid.RowProperty, 0);
             nameLabel.SetValue(Grid.ColumnProperty, 0);
-            nameLabel.SetValue(Label.TextProperty, "Name");
+            nameLabel.SetValue(Label.TextProperty, " Name");
+            nameLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
+            nameLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
             nameLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
-            //nameLabel.SetValue(Label.BackgroundProperty, Colors.White);
 
             var userPositionLabel = new Label();
             userPositionLabel.SetValue(Grid.RowProperty, 0);
             userPositionLabel.SetValue(Grid.ColumnProperty, 1);
             userPositionLabel.SetValue(Label.TextProperty, "Position");
+            userPositionLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
+            userPositionLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
             userPositionLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
             userPositionLabel.SetValue(Label.HorizontalTextAlignmentProperty, TextAlignment.Center);
-            //userPositionLabel.SetValue(Label.BackgroundProperty, Colors.White);
 
             var remainingTimeLabel = new Label();
             remainingTimeLabel.SetValue(Grid.RowProperty, 0);
             remainingTimeLabel.SetValue(Grid.ColumnProperty, 2);
             remainingTimeLabel.SetValue(Label.TextProperty, "Remaining");
+            remainingTimeLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
+            remainingTimeLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
             remainingTimeLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
-            //valueLabel.SetValue(Label.BackgroundProperty, Colors.White);
             
             var targetLabel = new Label();
             targetLabel.SetValue(Grid.ColumnProperty, 3);
             targetLabel.SetValue(Grid.RowProperty, 0);
             targetLabel.SetValue(Label.TextProperty, "Target");
+            targetLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
+            targetLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
             targetLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
-            //valueLabel.SetValue(Label.BackgroundProperty, Colors.White);
-            
+
             //var startDateLabel = new Label();
             //startDateLabel.SetValue(Grid.RowProperty, 0);
             //startDateLabel.SetValue(Grid.ColumnProperty, 4);
             //startDateLabel.SetValue(Label.TextProperty, "Start Date");
+            //startDateLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
+            //startDateLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
             //startDateLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
-            ////valueLabel.SetValue(Label.BackgroundProperty, Colors.White);
-            
+
             //var endDateLabel = new Label();
             //endDateLabel.SetValue(Grid.RowProperty, 0);
             //endDateLabel.SetValue(Grid.ColumnProperty, 5);
             //endDateLabel.SetValue(Label.TextProperty, "End Date");
+            //endDateLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
+            //endDateLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
             //endDateLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
-            ////valueLabel.SetValue(Label.BackgroundProperty, Colors.White);
 
             TradingCompetitionGrid.RowDefinitions.Add(new RowDefinition());
             TradingCompetitionGrid.Children.Add(nameLabel);

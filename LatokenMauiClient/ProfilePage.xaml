@@ -28,30 +28,24 @@
             <Label 
                   Text="Profile Name"
                   Padding="4"
-                  FontAttributes="Bold"
-                  BackgroundColor="White" />
+                  FontAttributes="Bold" />
             <Editor 
                   Text="{Binding ProfileName}"
-                  FontAttributes="Bold"
-                  BackgroundColor="White" />
+                  FontAttributes="Bold"/>
             <Label 
                   Text="Api Key"
                   Padding="4"
-                  FontAttributes="Bold"
-                  BackgroundColor="White" />
+                  FontAttributes="Bold"/>
             <Editor 
                       Text="{Binding ApiKey}"
-                      FontAttributes="Bold"
-                      BackgroundColor="White" />
+                      FontAttributes="Bold"/>
             <Label 
                       Text="Api Secret"
                       Padding="4"
-                      FontAttributes="Bold"
-                      BackgroundColor="White" />
+                      FontAttributes="Bold"/>
             <Editor 
                       Text="{Binding ApiSecret}"
-                      FontAttributes="Bold"
-                      BackgroundColor="White" />
+                      FontAttributes="Bold" />
             <Button
                     Text="Save"
                     Command="{Binding SaveCommand}"/>
