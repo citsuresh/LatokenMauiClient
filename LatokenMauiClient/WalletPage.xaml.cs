@@ -6,14 +6,12 @@ namespace LatokenMauiClient
         private bool isFirstVisit = true;
 
         public AssetPageViewModel ViewModel { get; set; }
-        public RowDefinition HeaderRowDefinition { get; }
-        public List<Task> Tasks { get; private set; }
+        private List<Task> Tasks { get; set; } = new List<Task>();
 
         public WalletPage(AssetPageViewModel viewModel)
         {
             InitializeComponent();
             this.ViewModel = viewModel;
-            this.ViewModel.AssetType = "WALLET";
         }
 
 
@@ -21,8 +19,8 @@ namespace LatokenMauiClient
         {
             if (this.isFirstVisit)
             {
-                this.isFirstVisit = false; 
-                this.Tasks = new List<Task>();
+                this.isFirstVisit = false;
+                this.Tasks.Clear();
                 RefreshButton.Text = "Refreshing...";
                 RefreshButton.IsEnabled = false;
                 Task.Run(() => PopulateAssets());
@@ -32,7 +30,7 @@ namespace LatokenMauiClient
 
         private void RefreshButton_Clicked(object sender, EventArgs e)
         {
-            this.Tasks = new List<Task>();
+            this.Tasks.Clear();
             RefreshButton.Text = "Refreshing...";
             RefreshButton.IsEnabled = false;
             Task.Run(() => PopulateAssets());
@@ -51,52 +49,37 @@ namespace LatokenMauiClient
             });
 
             var walletAssets = this.ViewModel.LoadWalletAssets();
-            if (walletAssets.Any() && this.ViewModel.RestClient != null)
+            if (walletAssets.Any())
             {
-                var currencies = this.ViewModel.RestClient.GetCurrencies();
                 int index = 1;
                 foreach (var asset in walletAssets)
                 {
-                    if (asset.Type != "WALLET")
-                        continue;
+                    var nameLabel = new Label();
+                    nameLabel.SetValue(Grid.RowProperty, index);
+                    nameLabel.SetValue(Grid.ColumnProperty, 0);
+                    nameLabel.SetValue(Label.TextProperty, asset.CurrencySymbol);
+                    nameLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
 
-                    var currency = currencies.FirstOrDefault(a => a.Id == asset.CurrencyId);
-                    if (currency != null)
+                    var quantityLabel = new Label();
+                    quantityLabel.SetValue(Grid.RowProperty, index);
+                    quantityLabel.SetValue(Grid.ColumnProperty, 1);
+                    quantityLabel.SetValue(Label.TextProperty, asset.Available);
+                    quantityLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+
+                    var valueLabel = new Label();
+                    valueLabel.SetValue(Grid.RowProperty, index);
+                    valueLabel.SetValue(Grid.ColumnProperty, 2);
+                    this.Tasks.Add(Task.Run(() => PopulateValueLabel(asset, valueLabel)));
+                    valueLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+
+                    Application.Current.Dispatcher.Dispatch(() =>
                     {
+                        AssetsGrid.RowDefinitions.Add(new RowDefinition());
+                        AssetsGrid.Children.Add(nameLabel);
+                        AssetsGrid.Children.Add(quantityLabel);
+                        AssetsGrid.Children.Add(valueLabel);
+                    });
 
-                        var nameLabel = new Label();
-                        nameLabel.SetValue(Grid.RowProperty, index);
-                        nameLabel.SetValue(Grid.ColumnProperty, 0);
-                        nameLabel.SetValue(Label.TextProperty, currency.Symbol);
-                        nameLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
-
-                        var quantityLabel = new Label();
-                        quantityLabel.SetValue(Grid.RowProperty, index);
-                        quantityLabel.SetValue(Grid.ColumnProperty, 1);
-                        quantityLabel.SetValue(Label.TextProperty, asset.Available);
-                        quantityLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
-
-                        var valueLabel = new Label();
-                        valueLabel.SetValue(Grid.RowProperty, index);
-                        valueLabel.SetValue(Grid.ColumnProperty, 2);
-                        if (currency.Symbol != "USDT")
-                        {
-                            this.Tasks.Add(Task.Run(() => PopulateValue(this.ViewModel.RestClient, currency.Symbol, asset, valueLabel)));
-                        }
-                        else
-                        {
-                            valueLabel.SetValue(Label.TextProperty, asset.Available);
-                        }
-                        valueLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
-
-                        Application.Current.Dispatcher.Dispatch(() =>
-                        {
-                            AssetsGrid.RowDefinitions.Add(new RowDefinition());
-                            AssetsGrid.Children.Add(nameLabel);
-                            AssetsGrid.Children.Add(quantityLabel);
-                            AssetsGrid.Children.Add(valueLabel);
-                        });
-                    }
                     index++;
                 }
                 Task.WaitAll(this.Tasks.ToArray());
@@ -134,7 +117,7 @@ namespace LatokenMauiClient
             valueLabel.SetValue(Grid.RowProperty, 0);
             valueLabel.SetValue(Grid.ColumnProperty, 2);
             valueLabel.SetValue(Label.TextProperty, "Value");
-            valueLabel.SetValue(Label.FontAttributesProperty,  FontAttributes.Bold);
+            valueLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
             valueLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
             valueLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
 
@@ -144,13 +127,12 @@ namespace LatokenMauiClient
             AssetsGrid.Children.Add(valueLabel);
         }
 
-        private void PopulateValue(LatokenRestClient restClient, string symbol, BalanceDto asset, Label valueLabel)
+        private void PopulateValueLabel(BalanceDto asset, Label valueLabel)
         {
-            var strPrice = restClient.GetLastTrade(symbol, "USDT")?.Price;
-            decimal price;
-            if (!string.IsNullOrEmpty(strPrice) && decimal.TryParse(strPrice, out price))
+            decimal assetValue = this.ViewModel.GetAssetValue(asset);
+            if (assetValue > 0)
             {
-                Application.Current.Dispatcher.Dispatch(() => valueLabel.SetValue(Label.TextProperty, asset.Available * price));
+                Application.Current.Dispatcher.Dispatch(() => valueLabel.SetValue(Label.TextProperty, assetValue));
             }
         }
     }

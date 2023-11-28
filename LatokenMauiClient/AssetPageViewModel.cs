@@ -9,11 +9,10 @@ namespace LatokenMauiClient
 {
     public partial class AssetPageViewModel : ObservableObject
     {
-        public UserProfile UserProfile { get; } = null;
-        public LatokenRestClient RestClient { get; private set; }
+        private UserProfile UserProfile { get; } = null;
+        private LatokenRestClient RestClient { get; set; }
 
-        [ObservableProperty]
-        private string assetType;
+        private IEnumerable<CurrencyDto> currencies = new CurrencyDto[0];
 
         public AssetPageViewModel()
         {
@@ -26,24 +25,87 @@ namespace LatokenMauiClient
                 !string.IsNullOrEmpty(apiSecret))
             {
                 this.UserProfile = new UserProfile { ProfileName = profileName, ApiKey = apiKey, ApiSecret = apiSecret };
+                this.RestClient = new LatokenRestClient(this.UserProfile.ApiKey, this.UserProfile.ApiSecret);
+                this.currencies = this.GetCurrencies();
+
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged([CallerMemberName] string name = "") =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-        internal IEnumerable<BalanceDto> LoadWalletAssets()
+        public IEnumerable<BalanceDto> LoadWalletAssets()
         {
-            if(this.UserProfile != null)
+            return this.LoadAssets("WALLET");
+        }
+
+        internal IEnumerable<BalanceDto> LoadSpotAssets()
+        {
+            return this.LoadAssets("SPOT");
+        }
+
+        public IEnumerable<BalanceDto> LoadAssets(string assetType)
+        {
+            if (this.RestClient != null)
             {
-                this.RestClient = new LatokenRestClient(this.UserProfile.ApiKey, this.UserProfile.ApiSecret);
-                var balances = this.RestClient.GetBalances(false);
-                return balances;
+                var allBalances = this.RestClient.GetBalances(false);
+                var assetTypeBalances = allBalances.Where(b => b.Type == assetType).ToList();
+                //Populate the CurrencySymbol Property
+                foreach (var asset in assetTypeBalances)
+                {
+                    var currency = currencies.FirstOrDefault(a => a.Id == asset.CurrencyId);
+
+                    if (currency != null)
+                    {
+                        asset.CurrencySymbol = currency.Symbol;
+                    }
+                    else
+                    {
+
+                    }
+                }
+                return assetTypeBalances;
             }
 
             return new BalanceDto[0];
+        }
+
+        public IEnumerable<CurrencyDto> GetCurrencies()
+        {
+            if (this.RestClient != null)
+            {
+                return this.RestClient.GetCurrencies();
+            }
+
+            return new CurrencyDto[0];
+        }
+
+        internal decimal GetAssetValue(BalanceDto asset)
+        {
+            if (asset != null)
+            {
+                if (!string.IsNullOrEmpty(asset.CurrencySymbol))
+                {
+                    if (asset.CurrencySymbol != "USDT")
+                    {
+
+                        var strPrice = this.RestClient.GetLastTrade(asset.CurrencySymbol, "USDT")?.Price;
+                        decimal price;
+                        if (!string.IsNullOrEmpty(strPrice) && decimal.TryParse(strPrice, out price))
+                        {
+                            return asset.Available * price;
+                        }
+                    }
+                    else
+                    {
+                        // Return the available value, if the asset is USDT
+                        return asset.Available;
+                    }
+                }
+                else
+                {
+                    //not required as the CurrencySymbol is already populated and not empty
+                }
+            }
+
+            return 0;
         }
     }
 }
