@@ -1,17 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Extensions.Configuration;
-using System.ComponentModel;
+using Latoken.Api.Client.Library;
 using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
 
 namespace LatokenMauiClient
 {
     public partial class TradingCompetitionsViewModel : ObservableObject
     {
-        public UserProfile UserProfile { get; } = null;
-        public LatokenRestClient RestClient { get; private set; }
-        public ICurrencyCache CurrencyCache { get; internal set; }
+        private UserProfile UserProfile { get; } = null;
+        private LatokenRestClient RestClient { get; set; }
+        private ICurrencyCache CurrencyCache { get; set; }
 
         public TradingCompetitionsViewModel(ICurrencyCache currencyCache)
         {
@@ -24,15 +21,49 @@ namespace LatokenMauiClient
                 !string.IsNullOrEmpty(apiKey) &&
                 !string.IsNullOrEmpty(apiSecret))
             {
-                this.UserProfile = new UserProfile { ProfileName = profileName, ApiKey = apiKey, ApiSecret = apiSecret }; 
+                this.UserProfile = new UserProfile { ProfileName = profileName, ApiKey = apiKey, ApiSecret = apiSecret };
                 this.RestClient = new LatokenRestClient(this.UserProfile.ApiKey, this.UserProfile.ApiSecret);
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public IEnumerable<TradingCompetitionData> GetTradingCompetitions()
+        {
+            if (this.RestClient != null && this.CurrencyCache != null)
+            {
+                var competitions = this.RestClient.GetTradingCompetitions().OrderBy(c => c.EndDate);
 
-        public void OnPropertyChanged([CallerMemberName] string name = "") =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+                foreach (var competition in competitions)
+                {
+                    var offset = DateTimeOffset.FromUnixTimeMilliseconds(competition.EndDate - DateTimeOffset.Now.ToUnixTimeMilliseconds());
+                    var remainingTime = $"{offset.DateTime.Day - 1} Days + {offset.DateTime.Hour}:{offset.DateTime.Minute}:{offset.DateTime.Second}";
 
+                    yield return new TradingCompetitionData
+                    {
+                        Id = competition.Id,
+                        Name = competition.Name.Replace("Trading competition", "").Trim(),
+                        TotalRewards = competition.Budget,
+                        WinnersLimit = competition.WinnersLimit,
+                        CurrencyId = competition.CurrencyId,
+                        StartDate = DateTimeOffset.FromUnixTimeMilliseconds(competition.StartDate).DateTime,
+                        EndDate = DateTimeOffset.FromUnixTimeMilliseconds(competition.EndDate).DateTime,
+                        Symbol = this.CurrencyCache.AvailableCurrencies.FirstOrDefault(c => c.Id == competition.CurrencyId)?.Symbol,
+                        TargetDisplay = competition.Target.Replace("TRADING_COMPETITION_TARGET_", string.Empty).Replace("_PLUS_", " + "),
+                        BudgetSplitDisplay = competition.BudgetSplit?.Replace("TRADING_COMPETITION_BUDGET_SPLIT_", string.Empty),
+                        StatusDisplay = competition.Status.Replace("TRADING_COMPETITION_STATUS_", string.Empty),
+                        RemainingTime = remainingTime
+                    };
+                }
+            }
+        }
+
+        public TradingCompetitionUserPosition GetUserPositionForTradingCompetition(TradingCompetitionData competition)
+        {
+            if (RestClient != null)
+            {
+                return this.RestClient.GetUserPositionForTradingCompetition(competition.Id);
+            }
+
+            return null;
+        }
     }
 }
