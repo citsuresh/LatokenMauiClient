@@ -62,7 +62,7 @@
                     var quantityLabel = new Label();
                     quantityLabel.SetValue(Grid.RowProperty, index);
                     quantityLabel.SetValue(Grid.ColumnProperty, 1);
-                    quantityLabel.SetValue(Label.TextProperty, asset.Available);
+                    quantityLabel.SetValue(Label.TextProperty, asset.Available.ToString().TrimEnd('0', '.'));
                     quantityLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
 
                     var valueLabel = new Label();
@@ -128,7 +128,7 @@
             decimal assetValue = this.ViewModel.GetAssetValue(asset);
             if (assetValue > 0)
             {
-                Application.Current.Dispatcher.Dispatch(() => valueLabel.SetValue(Label.TextProperty, assetValue));
+                Application.Current.Dispatcher.Dispatch(() => valueLabel.SetValue(Label.TextProperty, assetValue.ToString().TrimEnd('0', '.')));
             }
         }
     }
