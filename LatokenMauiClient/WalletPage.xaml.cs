@@ -65,12 +65,14 @@ namespace LatokenMauiClient
                     quantityLabel.SetValue(Grid.ColumnProperty, 1);
                     quantityLabel.SetValue(Label.TextProperty, asset.Available.ToString().TrimEnd('0', '.'));
                     quantityLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+                    quantityLabel.SetValue(Label.LineBreakModeProperty, LineBreakMode.TailTruncation);
 
                     var valueLabel = new Label();
                     valueLabel.SetValue(Grid.RowProperty, index);
                     valueLabel.SetValue(Grid.ColumnProperty, 2);
                     this.Tasks.Add(Task.Run(() => PopulateValueLabel(asset, valueLabel)));
                     valueLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+                    valueLabel.SetValue(Label.LineBreakModeProperty, LineBreakMode.TailTruncation);
 
                     Application.Current.Dispatcher.Dispatch(() =>
                     {
