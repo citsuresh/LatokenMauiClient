@@ -7,7 +7,28 @@
     Shell.FlyoutBehavior="Disabled"
     Loaded="Shell_Loaded"
     Title="LatokenMauiClient">
-    <FlyoutItem Route="pages">
+    <TabBar>
+        <Tab Title="Profile" Icon="profile.svg">
+            <ShellContent Title="Profile"
+               Route="profile" 
+               ContentTemplate="{DataTemplate local:ProfilePage}" />
+        </Tab>
+        <Tab Title="Trading Competitions" Icon="tradingcomp.svg">
+            <ShellContent Title="Trading Competitions" 
+               Route="tradingCompetitions" 
+               ContentTemplate="{DataTemplate local:TradingCompetitionsPage}" />
+        </Tab>
+        <Tab Title="Assets" Icon="assets.svg">
+            <ShellContent Title="Wallet Balances" 
+              Route="wallet" 
+              ContentTemplate="{DataTemplate local:WalletPage}"  />
+            <ShellContent Title="Spot Balances" 
+              Route="spot" 
+              ContentTemplate="{DataTemplate local:SpotPage}" />
+        </Tab>
+       
+    </TabBar>
+    <!--<FlyoutItem Route="pages">
         <ShellContent Title="Profile"
                       Route="profile" 
                       ContentTemplate="{DataTemplate local:ProfilePage}" />
@@ -20,6 +41,6 @@
         <ShellContent Title="Spot Balances" 
                       Route="spot" 
                       ContentTemplate="{DataTemplate local:SpotPage}" />
-    </FlyoutItem>
+    </FlyoutItem>-->
 
 </Shell>
