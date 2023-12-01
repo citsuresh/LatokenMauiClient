@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:LatokenMauiClient"
+             x:Class="LatokenMauiClient.TradingCompetitionRewardsPage" Loaded="ContentPage_Loaded">
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+                <Button x:Name="RefreshButton" Text="Refresh" Clicked="RefreshButton_Clicked" />
+                <ActivityIndicator x:Name="BusyIndicator"  IsRunning="True" />
+                <Label
+                Text="Trading Competition Rewards"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" />
+                <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                    <Label
+                        Text="for the last"
+                        Margin="10,0,10,0"
+                        Style="{StaticResource SubHeadline}"
+                        SemanticProperties.HeadingLevel="Level2" />
+                    <Editor WidthRequest="60"
+                            HorizontalTextAlignment="Center"
+                            Text="{Binding RewardDuration}"
+                            IsEnabled="{Binding IsRewardDurationEditable}"
+                            FontSize="16"
+                            FontAttributes="Bold"/>
+                    <Label
+                        Text="days"
+                        Margin="10,0,10,0"
+                        Style="{StaticResource SubHeadline}"
+                        SemanticProperties.HeadingLevel="Level2" />
+                </StackLayout>
+                
+                <Border>
+
+                    <Grid x:Name="TradingCompetitionRewardsGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0"
+                         Grid.Column="0"
+                         Text=" Time"
+                         x:Name="TimeStampColumnHeader"
+                         Padding="4"
+                         FontAttributes="Bold"/>
+                        <Label Grid.Row="0"
+                         Grid.Column="1"
+                         Text="Asset"
+                         x:Name="AssetHeader"
+                         Padding="4"
+                         FontAttributes="Bold" 
+                         HorizontalTextAlignment="Center"/>
+                        <Label Grid.Row="0"
+                         Grid.Column="2"
+                         Text="Amount"
+                         x:Name="TransferringFundsColumnHeader"
+                         Padding="4"
+                         FontAttributes="Bold"/>
+                        <Label Grid.Row="0"
+                         Grid.Column="3"
+                         Text="USD Value"
+                         x:Name="UsdValueColumnHeader"
+                         Padding="4"
+                         FontAttributes="Bold"/>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

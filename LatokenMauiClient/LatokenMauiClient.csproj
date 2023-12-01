@@ -96,6 +96,9 @@
 	  <Compile Update="ProfilePage.xaml.cs">
 	    <DependentUpon>ProfilePage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="TradingCompetitionRewardsPage.xaml.cs">
+	    <DependentUpon>TradingCompetitionRewardsPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="TradingCompetitionsPage.xaml.cs">
 	    <DependentUpon>TradingCompetitionsPage.xaml</DependentUpon>
 	  </Compile>
@@ -109,6 +112,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="ProfilePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="TradingCompetitionRewardsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="TradingCompetitionsPage.xaml">

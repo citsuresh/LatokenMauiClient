@@ -17,6 +17,9 @@
             <ShellContent Title="Trading Competitions" 
                Route="tradingCompetitions" 
                ContentTemplate="{DataTemplate local:TradingCompetitionsPage}" />
+            <ShellContent Title="Rewards" 
+               Route="tradingCompetitionRewards" 
+               ContentTemplate="{DataTemplate local:TradingCompetitionRewardsPage}" />
         </Tab>
         <Tab Title="Assets" Icon="assets.svg">
             <ShellContent Title="Wallet Balances" 

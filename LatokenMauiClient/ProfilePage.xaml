@@ -21,7 +21,7 @@
             Padding="30,0"
             Spacing="25">
             <Label
-                Text="Assets"
+                Text="User Profile"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
 

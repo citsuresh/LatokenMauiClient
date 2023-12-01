@@ -17,11 +17,11 @@ namespace LatokenMauiClient
         {
             if (this.ViewModel.UserProfile != null)
             {
-                GoToAsync("//pages/tradingCompetitions");
+                GoToAsync("//tradingCompetitions");
             }
             else
             {
-                GoToAsync("//pages/profile");
+                GoToAsync("//profile");
             }
         }
     }
