@@ -313,6 +313,36 @@ namespace LatokenMauiClient
             return balances.Select(b => this.ConvertToBalanceDto(b));
         }
 
+        public IEnumerable<TransferDto> GetAllTransfers(int page = 0)
+        {
+            var transfers = ClientInstance.GetTransfers(page).Result;
+            return transfers.Content.Select(tr => this.ConvertToTransferDto(tr));
+        }
+        private TransferDto ConvertToTransferDto(Transfer transfer)
+        {
+            return new TransferDto
+            {
+                Id = transfer.Id,
+                CodeRequired = transfer.CodeRequired,
+                Currency = transfer.Currency,
+                Direction = transfer.Direction,
+                Fee = transfer.Fee,
+                FromAccount = transfer.FromAccount,
+                ToAccount = transfer.ToAccount,
+                FromUser = transfer.FromUser,
+                ToUser = transfer.ToUser,
+                Method = transfer.Method,
+                Recipient = transfer.Recipient,
+                RejectReason = transfer.RejectReason,
+                Sender = transfer.Sender,
+                Status = transfer.Status,
+                Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(transfer.Timestamp).DateTime,
+                TransferringFunds = transfer.TransferringFunds,
+                Type = transfer.Type,
+                UsdValue = transfer.UsdValue,
+            };
+        }
+
         private BalanceDto ConvertToBalanceDto(Balance b)
         {
             return new BalanceDto
