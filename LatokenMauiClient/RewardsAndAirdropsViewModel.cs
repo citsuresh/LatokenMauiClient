@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 
 namespace LatokenMauiClient
 {
-    public partial class TradingCompetitionRewardsViewModel : ObservableObject
+    public partial class RewardsAndAirdropsViewModel : ObservableObject
     {
         private UserProfile userProfile;
         private LatokenRestClient restClient;
@@ -15,7 +15,7 @@ namespace LatokenMauiClient
         [ObservableProperty]
         private bool isRewardDurationEditable = true;
 
-        public TradingCompetitionRewardsViewModel(ICurrencyCache currencyCache)
+        public RewardsAndAirdropsViewModel(ICurrencyCache currencyCache)
         {
             this.currencyCache = currencyCache;
             var profileName = Preferences.Default.Get<string>("ProfileName", string.Empty);
@@ -55,7 +55,8 @@ namespace LatokenMauiClient
                         {
                             isFetchComplete = true;
                         }
-                        else if (transfer.Type.Contains("TRADING_COMPETITION"))
+                        else if (transfer.Type.Contains("TRADING_COMPETITION") ||
+                                    transfer.Type.Contains("AIRDROP"))
                         {
                             transferList.Add(transfer);
                         }

@@ -13,13 +13,13 @@
                Route="profile" 
                ContentTemplate="{DataTemplate local:ProfilePage}" />
         </Tab>
-        <Tab Title="Trading Competitions" Icon="tradingcomp.svg">
+        <Tab Title="Competitions/Rewards" Icon="tradingcomp.svg">
             <ShellContent Title="Trading Competitions" 
                Route="tradingCompetitions" 
                ContentTemplate="{DataTemplate local:TradingCompetitionsPage}" />
             <ShellContent Title="Rewards" 
-               Route="tradingCompetitionRewards" 
-               ContentTemplate="{DataTemplate local:TradingCompetitionRewardsPage}" />
+               Route="rewardsAndAirdrops" 
+               ContentTemplate="{DataTemplate local:RewardsAndAirdropsPage}" />
         </Tab>
         <Tab Title="Assets" Icon="assets.svg">
             <ShellContent Title="Wallet Balances" 

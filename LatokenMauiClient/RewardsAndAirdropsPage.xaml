@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:LatokenMauiClient"
-             x:Class="LatokenMauiClient.TradingCompetitionRewardsPage" Loaded="ContentPage_Loaded">
+             x:Class="LatokenMauiClient.RewardsAndAirdropsPage" Loaded="ContentPage_Loaded">
     <ContentPage.Content>
         <ScrollView>
             <VerticalStackLayout
@@ -11,7 +11,7 @@
                 <Button x:Name="RefreshButton" Text="Refresh" Clicked="RefreshButton_Clicked" />
                 <ActivityIndicator x:Name="BusyIndicator"  IsRunning="True" />
                 <Label
-                Text="Trading Competition Rewards"
+                Text="Rewards/Aidrops"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
                 <StackLayout Orientation="Horizontal" HorizontalOptions="Center">

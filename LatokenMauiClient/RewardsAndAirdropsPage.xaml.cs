@@ -1,12 +1,12 @@
 ﻿namespace LatokenMauiClient
 {
-    public partial class TradingCompetitionRewardsPage : ContentPage
+    public partial class RewardsAndAirdropsPage : ContentPage
     {
         private bool isFirstVisit = true;
 
-        public TradingCompetitionRewardsViewModel ViewModel { get; set; }
+        public RewardsAndAirdropsViewModel ViewModel { get; set; }
 
-        public TradingCompetitionRewardsPage(TradingCompetitionRewardsViewModel viewModel)
+        public RewardsAndAirdropsPage(RewardsAndAirdropsViewModel viewModel)
         {
             this.ViewModel = viewModel;
             this.BindingContext = this.ViewModel;
