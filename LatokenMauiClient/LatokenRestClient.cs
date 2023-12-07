@@ -32,6 +32,8 @@ namespace LatokenMauiClient
             private set => m_restClient = value;
         }
 
+        public TradingPlatform TradingPlatform => TradingPlatform.Latoken;
+
         public string PublicKey { get; private set; }
         public string PrivateKey { get; private set; }
 
@@ -250,7 +252,7 @@ namespace LatokenMauiClient
         {
             return new OrderDto[0];
         }
-        
+
         public IEnumerable<OrderDto> GetCompletedOrdersUntil(int days, int size)
         {
             var orders = GetOrdersUntil(days, size);
@@ -318,6 +320,7 @@ namespace LatokenMauiClient
             var transfers = ClientInstance.GetTransfers(page).Result;
             return transfers.Content.Select(tr => this.ConvertToTransferDto(tr));
         }
+
         private TransferDto ConvertToTransferDto(Transfer transfer)
         {
             return new TransferDto
@@ -394,9 +397,21 @@ namespace LatokenMauiClient
             return ClientInstance.TransferInternal(command).Result;
         }
 
-        public TradingCompetitionUserPosition GetUserPositionForTradingCompetition(string competitionId)
+        public TradingCompetitionUserPositionDto GetUserPositionForTradingCompetition(string competitionId)
         {
-            return ClientInstance.GetUserPositionForTradingCompetition(competitionId).Result;
+            var userPosition = ClientInstance.GetUserPositionForTradingCompetition(competitionId).Result;
+            return this.ConvertToTradingCompetitionUserPositionDto(userPosition);
+        }
+
+        private TradingCompetitionUserPositionDto ConvertToTradingCompetitionUserPositionDto(TradingCompetitionUserPosition userPosition)
+        {
+            return new TradingCompetitionUserPositionDto
+            {
+                Nickname = userPosition.Nickname,
+                Position = userPosition.Position,
+                RewardValue = userPosition.RewardValue,
+                TargetValue = userPosition.TargetValue,
+            };
         }
 
         public bool IsReady()

@@ -56,11 +56,20 @@ namespace LatokenMauiClient
             }
         }
 
-        public TradingCompetitionUserPosition GetUserPositionForTradingCompetition(TradingCompetitionData competition)
+        public TradingCompetitionUserPositionDto GetUserPositionForTradingCompetition(TradingCompetitionData competition)
         {
             if (restClient != null)
             {
-                return this.restClient.GetUserPositionForTradingCompetition(competition.Id);
+                var userPosition = this.restClient.GetUserPositionForTradingCompetition(competition.Id);
+                if (userPosition != null)
+                {
+                    var currency = this.currencyCache.GetCurrencyById(competition.CurrencyId); 
+                    var lastTrade = this.restClient.GetLastTrade(currency?.Symbol, this.currencyCache.USDTCurrency.Symbol);
+
+                    userPosition.UsdValue = (decimal.Parse(userPosition.RewardValue) * decimal.Parse(lastTrade.Price)).ToString("0.##");
+                }
+
+                return userPosition;
             }
 
             return null;

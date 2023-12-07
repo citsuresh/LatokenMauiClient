@@ -61,8 +61,7 @@
                 userPositionLabel.SetValue(Label.HorizontalTextAlignmentProperty, TextAlignment.Center);
                 userPositionLabel.SetValue(Grid.ColumnProperty, 1);
                 userPositionLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
-                userPositionLabel.SetValue(Label.TextProperty, userPosition?.Position);
-
+                userPositionLabel.SetValue(Label.TextProperty, userPosition?.Position + "  ($" + userPosition?.UsdValue + ")");
                 var remainingTimeLabel = new Label();
                 remainingTimeLabel.SetValue(Grid.RowProperty, index);
                 remainingTimeLabel.SetValue(Grid.ColumnProperty, 2);

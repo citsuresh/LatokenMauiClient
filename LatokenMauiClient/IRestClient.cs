@@ -11,6 +11,8 @@ namespace LatokenMauiClient
         //Todo remove this later
         ILARestClient ClientInstance { get; }
 
+        TradingPlatform TradingPlatform { get; }
+
         IEnumerable<CurrencyDto> GetCurrencies();
 
         //CurrencyDto GetCurrency(string currencyId);
@@ -19,7 +21,7 @@ namespace LatokenMauiClient
 
         IEnumerable<TradingCompetition> GetTradingCompetitions(int page = 0);
 
-        IEnumerable<TradingCompetitionLeaderBoardPosition> GetTradingCompetitionLeaderBoard(string competitionId, int page = 0, int size=100);
+        IEnumerable<TradingCompetitionLeaderBoardPosition> GetTradingCompetitionLeaderBoard(string competitionId, int page = 0, int size = 100);
 
         OrderBookDto GetOrderBook(CurrencyDto baseCurrency, CurrencyDto quoteCurrency, int limit);
         FeeScheme GetFeeSchemeForPair(string baseCurrency, string quoteCurrency);
@@ -41,6 +43,7 @@ namespace LatokenMauiClient
         OrderResponse CancelOrder(OrderIdCommand command);
         OrderDto GetOrder(OrderIdCommand command);
         IEnumerable<BalanceDto> GetBalances(bool zeros = true);
+        IEnumerable<TransferDto> GetAllTransfers(int page = 0);
         CancelAllOrdersResponce CancelAllOrders(string baseCurrency, string quoteCurrency);
         LatokenUser GetUser();
         BalanceDto GetWalletBalanceByCurrency(string currencyId);
@@ -71,7 +74,7 @@ namespace LatokenMauiClient
         ///     Returns true if the REST client is ready to establish a connection
         /// </summary>        
 
-        TradingCompetitionUserPosition GetUserPositionForTradingCompetition(string competitionId);
+        TradingCompetitionUserPositionDto GetUserPositionForTradingCompetition(string competitionId);
 
         bool IsReady();
     }

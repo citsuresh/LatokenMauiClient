@@ -6,6 +6,7 @@
         private List<CurrencyDto> availableCurrencies = new List<CurrencyDto>();
         private List<string> availableCurrencyTags = new List<string>();
         private List<PairDto> availablePairs = new List<PairDto>();
+        private CurrencyDto usdtCurrency;
 
         public bool IsInitialized { get; set; } = false;
 
@@ -24,6 +25,24 @@
             set
             {
                 availableCurrencies = value;
+            }
+        }
+
+        public CurrencyDto USDTCurrency
+        {
+            get
+            {
+                if (usdtCurrency == null)
+                {
+                    usdtCurrency = this.AvailableCurrencies.FirstOrDefault(c => c.Symbol == "USDT");
+                }
+
+                return usdtCurrency;
+            }
+
+            set
+            {
+                usdtCurrency = value;
             }
         }
 
@@ -86,6 +105,11 @@
             {
                 restClient = value;
             }
+        }
+
+        public CurrencyDto? GetCurrencyById(string currencyId)
+        {
+            return this.AvailableCurrencies.FirstOrDefault(curr => curr.Id == currencyId);
         }
 
         public void RefreshCache()
