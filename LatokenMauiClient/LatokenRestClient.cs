@@ -72,7 +72,7 @@ namespace LatokenMauiClient
 
         public IEnumerable<TradingCompetition> GetTradingCompetitions(int page = 0)
         {
-            var tradingCompetitions = ClientInstance.GetTradingCompetitions(page).Result.Content;
+            var tradingCompetitions = ClientInstance.GetActiveTradingCompetitions(page).Result.Content;
             return tradingCompetitions;
         }
 
