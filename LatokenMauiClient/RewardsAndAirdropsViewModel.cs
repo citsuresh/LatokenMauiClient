@@ -55,8 +55,9 @@ namespace LatokenMauiClient
                         {
                             isFetchComplete = true;
                         }
-                        else if (transfer.Type.Contains("TRADING_COMPETITION") ||
-                                    transfer.Type.Contains("AIRDROP"))
+                        else if (transfer.Type.Contains("TRADING_COMPETITION")
+                                    || transfer.Type.Contains("AIRDROP")
+                                    || transfer.Type.Contains("DISTRIBUTION"))
                         {
                             transferList.Add(transfer);
                         }
