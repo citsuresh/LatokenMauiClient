@@ -1,4 +1,6 @@
 ﻿
+using CommunityToolkit.Mvvm.Messaging;
+
 namespace LatokenMauiClient
 {
     public partial class WalletPage : ContentPage
@@ -10,8 +12,18 @@ namespace LatokenMauiClient
 
         public WalletPage(AssetPageViewModel viewModel)
         {
+            WeakReferenceMessenger.Default.Register<SelectedProfileChangedMessage>(this, this.OnSelectedProfileChangedMessage);
             InitializeComponent();
             this.ViewModel = viewModel;
+        }
+
+        private void OnSelectedProfileChangedMessage(object recipient, SelectedProfileChangedMessage message)
+        {
+            if (Shell.Current.CurrentPage == this && ViewModel != null && this.RefreshButton != null)
+            {
+                this.ViewModel.InitializeProfileAndRestClient();
+                this.OnRefresh();
+            }
         }
 
 
@@ -20,15 +32,17 @@ namespace LatokenMauiClient
             if (this.isFirstVisit)
             {
                 this.isFirstVisit = false;
-                this.Tasks.Clear();
-                RefreshButton.Text = "Refreshing...";
-                RefreshButton.IsEnabled = false;
-                Task.Run(() => PopulateAssets());
+                this.OnRefresh();
             }
         }
 
 
         private void RefreshButton_Clicked(object sender, EventArgs e)
+        {
+            this.OnRefresh();
+        }
+
+        private void OnRefresh()
         {
             this.Tasks.Clear();
             RefreshButton.Text = "Refreshing...";

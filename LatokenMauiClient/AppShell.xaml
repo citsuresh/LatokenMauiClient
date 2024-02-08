@@ -9,8 +9,17 @@
     Title="LatokenMauiClient">
     <TabBar>
         <Tab Title="Profile" Icon="profile.svg">
-            <ShellContent Title="Profile"
-               Route="profile" 
+            <ShellContent Title="Profile 1"
+               Route="profile1" 
+               Appearing="Profile1ShellContent_Appearing"           
+               ContentTemplate="{DataTemplate local:ProfilePage}" />
+            <ShellContent Title="Profile 2"
+               Route="profile2" 
+               Appearing="Profile2ShellContent_Appearing"
+               ContentTemplate="{DataTemplate local:ProfilePage}" />
+            <ShellContent Title="Profile 3"
+               Route="profile3" 
+               Appearing="Profile3ShellContent_Appearing"
                ContentTemplate="{DataTemplate local:ProfilePage}" />
         </Tab>
         <Tab Title="Competitions/Rewards" Icon="tradingcomp.svg">

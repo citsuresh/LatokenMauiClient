@@ -1,4 +1,6 @@
-﻿namespace LatokenMauiClient
+﻿using CommunityToolkit.Mvvm.Messaging;
+
+namespace LatokenMauiClient
 {
     public partial class RewardsAndAirdropsPage : ContentPage
     {
@@ -8,31 +10,41 @@
 
         public RewardsAndAirdropsPage(RewardsAndAirdropsViewModel viewModel)
         {
+            WeakReferenceMessenger.Default.Register<SelectedProfileChangedMessage>(this, this.OnSelectedProfileChangedMessage);
             this.ViewModel = viewModel;
             this.BindingContext = this.ViewModel;
             InitializeComponent();
         }
 
+        private void OnSelectedProfileChangedMessage(object recipient, SelectedProfileChangedMessage message)
+        {
+            if (Shell.Current.CurrentPage == this && ViewModel != null && RefreshButton != null )
+            {
+                this.ViewModel.InitializeProfileAndRestClient();
+                this.OnRefresh();
+            }
+        }
 
         private void ContentPage_Loaded(object sender, EventArgs e)
         {
             if (this.isFirstVisit)
             {
                 this.isFirstVisit = false;
-                RefreshButton.Text = "Refreshing...";
-                RefreshButton.IsEnabled = false;
-                Task.Run(() => RefreshTradingCompetitionRewards());
+                this.OnRefresh();
             }
         }
 
 
         private void RefreshButton_Clicked(object sender, EventArgs e)
         {
+            this.OnRefresh();
+        }
+        private void OnRefresh()
+        {
             RefreshButton.Text = "Refreshing...";
             RefreshButton.IsEnabled = false;
             Task.Run(() => RefreshTradingCompetitionRewards());
         }
-
         public void RefreshTradingCompetitionRewards()
         {
             Application.Current.Dispatcher.Dispatch(() =>

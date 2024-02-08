@@ -5,23 +5,24 @@ namespace LatokenMauiClient
 {
     public partial class AssetPageViewModel : ObservableObject
     {
-        private UserProfile userProfile;
+        private Profile userProfile;
         private LatokenRestClient restClient;
         private ICurrencyCache currencyCache;
 
         public AssetPageViewModel(ICurrencyCache currencyCache)
         {
-            this.currencyCache = currencyCache;
-            var profileName = Preferences.Default.Get<string>("ProfileName", string.Empty);
-            var apiKey = Preferences.Default.Get<string>("ApiKey", string.Empty);
-            var apiSecret = Preferences.Default.Get<string>("ApiSecret", string.Empty);
+            this.currencyCache = currencyCache;            
+            //InitializeProfileAndRestClient();
+        }
 
-            if (!string.IsNullOrEmpty(profileName) &&
-                !string.IsNullOrEmpty(apiKey) &&
-                !string.IsNullOrEmpty(apiSecret))
+        public void InitializeProfileAndRestClient()
+        {
+            var profileFilterInstance = App.Current.Resources["ProfileFilterInstance"] as ProfileFilter;
+            if (profileFilterInstance != null && profileFilterInstance.SelectedProfile != null)
             {
-                this.userProfile = new UserProfile { ProfileName = profileName, ApiKey = apiKey, ApiSecret = apiSecret };
-                this.restClient = new LatokenRestClient(this.userProfile.ApiKey, this.userProfile.ApiSecret);
+                var profile = profileFilterInstance.SelectedProfile;
+                this.userProfile = profile;
+                this.restClient = new LatokenRestClient(profile.ApiKey, profile.ApiSecret);
             }
         }
 
@@ -37,6 +38,11 @@ namespace LatokenMauiClient
 
         private IEnumerable<BalanceDto> LoadAssets(string assetType)
         {
+            if (this.restClient == null)
+            {
+                this.InitializeProfileAndRestClient();
+            }
+
             if (this.restClient != null && this.currencyCache != null)
             {
                 var allBalances = this.restClient.GetBalances(false);

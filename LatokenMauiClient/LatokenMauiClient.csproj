@@ -114,6 +114,9 @@
 	  <MauiXaml Update="ProfilePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="ProfileTitle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="RewardsAndAirdropsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Maui.Controls;
 using System.Windows.Input;
 
@@ -23,6 +24,20 @@ namespace LatokenMauiClient
             {
                 GoToAsync("//profile");
             }
+        }
+
+        private void Profile1ShellContent_Appearing(object sender, EventArgs e)
+        {
+            WeakReferenceMessenger.Default.Send(new ProfilePageNavigatedToMessage((sender as ShellContent).Title));
+        }
+        private void Profile2ShellContent_Appearing(object sender, EventArgs e)
+        {
+            WeakReferenceMessenger.Default.Send(new ProfilePageNavigatedToMessage((sender as ShellContent).Title));
+
+        }
+        private void Profile3ShellContent_Appearing(object sender, EventArgs e)
+        {
+            WeakReferenceMessenger.Default.Send(new ProfilePageNavigatedToMessage((sender as ShellContent).Title));
         }
     }
 }

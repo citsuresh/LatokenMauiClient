@@ -5,7 +5,7 @@ namespace LatokenMauiClient
 {
     public partial class RewardsAndAirdropsViewModel : ObservableObject
     {
-        private UserProfile userProfile;
+        private Profile userProfile;
         private LatokenRestClient restClient;
         private ICurrencyCache currencyCache;
 
@@ -18,67 +18,75 @@ namespace LatokenMauiClient
         public RewardsAndAirdropsViewModel(ICurrencyCache currencyCache)
         {
             this.currencyCache = currencyCache;
-            var profileName = Preferences.Default.Get<string>("ProfileName", string.Empty);
-            var apiKey = Preferences.Default.Get<string>("ApiKey", string.Empty);
-            var apiSecret = Preferences.Default.Get<string>("ApiSecret", string.Empty);
+            //InitializeProfileAndRestClient();
+        }
 
-            if (!string.IsNullOrEmpty(profileName) &&
-                !string.IsNullOrEmpty(apiKey) &&
-                !string.IsNullOrEmpty(apiSecret))
+        internal void InitializeProfileAndRestClient()
+        {
+            var profileFilterInstance = App.Current.Resources["ProfileFilterInstance"] as ProfileFilter;
+            if (profileFilterInstance != null && profileFilterInstance.SelectedProfile != null)
             {
-                this.userProfile = new UserProfile { ProfileName = profileName, ApiKey = apiKey, ApiSecret = apiSecret };
-                this.restClient = new LatokenRestClient(this.userProfile.ApiKey, this.userProfile.ApiSecret);
+                var profile = profileFilterInstance.SelectedProfile;
+                this.userProfile = profile;
+                this.restClient = new LatokenRestClient(profile.ApiKey, profile.ApiSecret);
             }
         }
 
         public IEnumerable<TransferDto> GetTradingCompetitionRewards()
         {
-            var days = this.RewardDuration;
-            var toDate = DateTime.Now.AddDays(-1 * days);
-
             List<TransferDto> transferList = new List<TransferDto>();
-            bool isFetchComplete = false;
-            int page = 0;
-            while (isFetchComplete == false)
+            if (this.restClient == null)
             {
-                var transfers = this.restClient?.GetAllTransfers(page).ToList();
+                this.InitializeProfileAndRestClient();
+            }
+            if (this.restClient != null && this.currencyCache != null)
+            {
+                var days = this.RewardDuration;
+                var toDate = DateTime.Now.AddDays(-1 * days);
 
-                if (transfers == null || !transfers.Any())
+                bool isFetchComplete = false;
+                int page = 0;
+                while (isFetchComplete == false)
                 {
-                    isFetchComplete = true;
-                }
-                else
-                {
-                    foreach (var transfer in transfers)
+                    var transfers = this.restClient.GetAllTransfers(page).ToList();
+
+                    if (transfers == null || !transfers.Any())
                     {
-                        if (transfer.Timestamp < toDate)
+                        isFetchComplete = true;
+                    }
+                    else
+                    {
+                        foreach (var transfer in transfers)
                         {
-                            isFetchComplete = true;
-                        }
-                        else if (transfer.Type.Contains("TRADING_COMPETITION")
-                                    || transfer.Type.Contains("AIRDROP")
-                                    || transfer.Type.Contains("DISTRIBUTION"))
-                        {
-                            transferList.Add(transfer);
+                            if (transfer.Timestamp < toDate)
+                            {
+                                isFetchComplete = true;
+                            }
+                            else if (transfer.Type.Contains("TRADING_COMPETITION")
+                                        || transfer.Type.Contains("AIRDROP")
+                                        || transfer.Type.Contains("DISTRIBUTION"))
+                            {
+                                transferList.Add(transfer);
+                            }
                         }
                     }
-                }
 
-                //Formatting and modifications before displaying in grid control
-                foreach (TransferDto transferInfo in transferList)
-                {
-                    transferInfo.Method = transferInfo.Method.Replace("TRANSFER_METHOD_", "");
-                    transferInfo.Status = transferInfo.Status.Replace("TRANSFER_STATUS_", "");
-                    transferInfo.Type = transferInfo.Type.Replace("TRANSFER_TYPE_", "");
-
-                    transferInfo.CurrencySymbol = currencyCache.AvailableCurrencies.FirstOrDefault(c => c.Id == transferInfo.Currency)?.Symbol;
-                    if (string.IsNullOrEmpty(transferInfo.CurrencySymbol))
+                    //Formatting and modifications before displaying in grid control
+                    foreach (TransferDto transferInfo in transferList)
                     {
-                        //TODO: cannot resolve currency
-                    }
-                }
+                        transferInfo.Method = transferInfo.Method.Replace("TRANSFER_METHOD_", "");
+                        transferInfo.Status = transferInfo.Status.Replace("TRANSFER_STATUS_", "");
+                        transferInfo.Type = transferInfo.Type.Replace("TRANSFER_TYPE_", "");
 
-                page++;
+                        transferInfo.CurrencySymbol = this.currencyCache.AvailableCurrencies.FirstOrDefault(c => c.Id == transferInfo.Currency)?.Symbol;
+                        if (string.IsNullOrEmpty(transferInfo.CurrencySymbol))
+                        {
+                            //TODO: cannot resolve currency
+                        }
+                    }
+
+                    page++;
+                }
             }
 
             return transferList;
