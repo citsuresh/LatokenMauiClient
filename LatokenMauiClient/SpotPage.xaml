@@ -14,6 +14,7 @@
                 <Button x:Name="RefreshButton" Text="Refresh" Clicked="RefreshButton_Clicked" />
                 <ActivityIndicator x:Name="BusyIndicator"  IsRunning="True" />
                 <Label
+                x:Name="SpotAssetsHeadingLabel"
                 Text="Spot Assets"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />

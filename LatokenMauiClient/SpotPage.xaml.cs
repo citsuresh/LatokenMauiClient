@@ -99,6 +99,9 @@ namespace LatokenMauiClient
                 }
                 Task.WaitAll(this.Tasks.ToArray());
                 this.Tasks.Clear();
+
+                this.SortAndRepopulateAssets(spotAssets);
+
                 Application.Current.Dispatcher.Dispatch(() =>
                 {
                     BusyIndicator.IsVisible = false;
@@ -107,6 +110,53 @@ namespace LatokenMauiClient
                     RefreshButton.IsEnabled = true;
                     AssetsGrid.IsEnabled = true;
                 });
+            }
+        }
+
+        private void SortAndRepopulateAssets(IEnumerable<BalanceDto> assets)
+        {
+            assets = assets.OrderByDescending(a => a.AvailableValue);
+            var totalValue = assets.Sum(a => a.AvailableValue);
+            Application.Current.Dispatcher.Dispatch(() =>
+            {
+                SpotAssetsHeadingLabel.Text = "Spot Assets ( " + totalValue.ToString("0.##") + " USDT )";
+                AssetsGrid.RowDefinitions.Clear();
+                AssetsGrid.Children.Clear();
+                AddHeaderRow();
+            });
+
+            int index = 1;
+            foreach (var asset in assets)
+            {
+                var nameLabel = new Label();
+                nameLabel.SetValue(Grid.RowProperty, index);
+                nameLabel.SetValue(Grid.ColumnProperty, 0);
+                nameLabel.SetValue(Label.TextProperty, asset.CurrencySymbol);
+                nameLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+
+                var quantityLabel = new Label();
+                quantityLabel.SetValue(Grid.RowProperty, index);
+                quantityLabel.SetValue(Grid.ColumnProperty, 1);
+                quantityLabel.SetValue(Label.TextProperty, asset.Available.ToString().TrimEnd('0').TrimEnd('.'));
+                quantityLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+                quantityLabel.SetValue(Label.LineBreakModeProperty, LineBreakMode.TailTruncation);
+
+                var valueLabel = new Label();
+                valueLabel.SetValue(Grid.RowProperty, index);
+                valueLabel.SetValue(Grid.ColumnProperty, 2);
+                valueLabel.SetValue(Label.TextProperty, asset.AvailableValue.ToString().TrimEnd('0').TrimEnd('.'));
+                valueLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+                valueLabel.SetValue(Label.LineBreakModeProperty, LineBreakMode.TailTruncation);
+
+                Application.Current.Dispatcher.Dispatch(() =>
+                {
+                    AssetsGrid.RowDefinitions.Add(new RowDefinition());
+                    AssetsGrid.Children.Add(nameLabel);
+                    AssetsGrid.Children.Add(quantityLabel);
+                    AssetsGrid.Children.Add(valueLabel);
+                });
+
+                index++;
             }
         }
 
@@ -129,7 +179,7 @@ namespace LatokenMauiClient
             var valueLabel = new Label();
             valueLabel.SetValue(Grid.RowProperty, 0);
             valueLabel.SetValue(Grid.ColumnProperty, 2);
-            valueLabel.SetValue(Label.TextProperty, "Value");
+            valueLabel.SetValue(Label.TextProperty, "Value in USDT");
             valueLabel.SetValue(Label.BackgroundColorProperty, Colors.Gray);
             valueLabel.SetValue(Label.TextColorProperty, App.Current.PlatformAppTheme == AppTheme.Light ? Colors.White : Colors.Black);
 
@@ -142,6 +192,7 @@ namespace LatokenMauiClient
         private void PopulateValueLabel(BalanceDto asset, Label valueLabel)
         {
             decimal assetValue = this.ViewModel.GetAssetValue(asset);
+            asset.AvailableValue = assetValue;
             if (assetValue > 0)
             {
                 Application.Current.Dispatcher.Dispatch(() => valueLabel.SetValue(Label.TextProperty, assetValue.ToString().TrimEnd('0').TrimEnd('.')));

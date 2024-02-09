@@ -14,9 +14,10 @@
                 <Button x:Name="RefreshButton" Text="Refresh" Clicked="RefreshButton_Clicked" />
                 <ActivityIndicator x:Name="BusyIndicator"  IsRunning="True" />
                 <Label
+                x:Name="WalletAssetsHeadingLabel"     
                 Text="Wallet Assets"
                 Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
+                SemanticProperties.HeadingLevel="Level1" />                
                 <Border>
 
                     <Grid x:Name="AssetsGrid">
