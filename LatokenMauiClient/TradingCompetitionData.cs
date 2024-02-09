@@ -24,5 +24,6 @@ namespace LatokenMauiClient
         public string Name { get; set; }
         public string TotalRewards { get; set; }
         public int WinnersLimit { get; set; }
+        public string PlaceRewardsDisplay { get; set; }
     }
 }

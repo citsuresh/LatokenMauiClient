@@ -52,7 +52,8 @@ namespace LatokenMauiClient
                         {
                             Id = competition.Id,
                             Name = competition.Name.Replace("Trading competition", "").Trim(),
-                            TotalRewards = competition.Budget,
+                            //TotalRewards = competition.Budget,
+                            PlaceRewardsDisplay = string.Join(", ", competition.PlaceRewards),
                             WinnersLimit = competition.WinnersLimit,
                             CurrencyId = competition.CurrencyId,
                             StartDate = DateTimeOffset.FromUnixTimeMilliseconds(competition.StartDate).DateTime,
