@@ -60,7 +60,7 @@ namespace LatokenMauiClient
                             EndDate = DateTimeOffset.FromUnixTimeMilliseconds(competition.EndDate).DateTime,
                             Symbol = this.currencyCache.AvailableCurrencies.FirstOrDefault(c => c.Id == competition.CurrencyId)?.Symbol,
                             TargetDisplay = competition.Target.Replace("TRADING_COMPETITION_TARGET_", string.Empty).Replace("_PLUS_", " + "),
-                            BudgetSplitDisplay = competition.BudgetSplit?.Replace("TRADING_COMPETITION_BUDGET_SPLIT_", string.Empty),
+                            //BudgetSplitDisplay = competition.BudgetSplit?.Replace("TRADING_COMPETITION_BUDGET_SPLIT_", string.Empty),
                             StatusDisplay = competition.Status.Replace("TRADING_COMPETITION_STATUS_", string.Empty),
                             RemainingTime = remainingTime
                         });
