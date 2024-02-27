@@ -5,7 +5,6 @@ namespace LatokenMauiClient
 {
     public partial class RewardsAndAirdropsViewModel : ObservableObject
     {
-        private Profile userProfile;
         private LatokenRestClient restClient;
         private ICurrencyCache currencyCache;
 
@@ -15,6 +14,10 @@ namespace LatokenMauiClient
         [ObservableProperty]
         private bool isRewardDurationEditable = true;
 
+
+        [ObservableProperty] 
+        private Profile userProfile;
+        
         public RewardsAndAirdropsViewModel(ICurrencyCache currencyCache)
         {
             this.currencyCache = currencyCache;

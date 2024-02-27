@@ -58,6 +58,38 @@ namespace LatokenMauiClient
                 AddHeaderRow();
             });
 
+            if(this.ViewModel.UserProfile == null)
+            {
+                this.ViewModel.InitializeProfileAndRestClient();
+            }
+
+            var profileName = this.ViewModel.UserProfile?.ProfileName;
+            LastUpdatedTimestampData lastUpdatedTimestampData = null;
+            LastUpdatedTransfersTimestampData lastUpdatedTimestampDataForProfile = null;
+            if (profileName != null)
+            {
+                var lastUpdatedSettingsString = Preferences.Default.Get<string>(profileName + "_LastUpdatedTimestampData", string.Empty); ;
+                if (!string.IsNullOrEmpty(lastUpdatedSettingsString))
+                {
+                    lastUpdatedTimestampData = new LastUpdatedTimestampData();
+                    lastUpdatedTimestampData.DeSerialize(lastUpdatedSettingsString);
+                }
+
+                if (lastUpdatedTimestampData == null)
+                {
+                    lastUpdatedTimestampData = new LastUpdatedTimestampData();
+                }
+
+                if (lastUpdatedTimestampData.TransfersTimestamps.ContainsKey(profileName))
+                {
+                    lastUpdatedTimestampDataForProfile = lastUpdatedTimestampData.TransfersTimestamps[profileName];
+                }
+                else
+                {
+                    lastUpdatedTimestampDataForProfile = new LastUpdatedTransfersTimestampData();
+                }
+            }
+
             var rewardsForDisplay = this.ViewModel.GetTradingCompetitionRewards();
             int index = 1;
             
@@ -87,6 +119,19 @@ namespace LatokenMauiClient
                 usdValueLabel.SetValue(Grid.ColumnProperty, 3);
                 usdValueLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
                 usdValueLabel.SetValue(Label.TextProperty, competitionReward.UsdValue);
+                
+                if (lastUpdatedTimestampDataForProfile != null && (lastUpdatedTimestampDataForProfile.LastUpdatedRewardsAirdropsTimeStamp == null
+                    || competitionReward.Timestamp > lastUpdatedTimestampDataForProfile.LastUpdatedRewardsAirdropsTimeStamp))
+                {
+                    timeStampLabel.SetValue(Label.TextColorProperty, Colors.Green);
+                    assetLabel.SetValue(Label.TextColorProperty, Colors.Green);
+                    transferringFundsLabel.SetValue(Label.TextColorProperty, Colors.Green);
+                    usdValueLabel.SetValue(Label.TextColorProperty, Colors.Green);
+                    timeStampLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
+                    assetLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
+                    transferringFundsLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
+                    usdValueLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
+                }
 
                 Application.Current.Dispatcher.Dispatch(() =>
                 {
@@ -97,6 +142,15 @@ namespace LatokenMauiClient
                     TradingCompetitionRewardsGrid.Children.Add(usdValueLabel);
                 });
                 index++;
+            }
+
+            if (profileName != null)
+            {
+                lastUpdatedTimestampDataForProfile.LastUpdatedRewardsAirdropsTimeStamp = rewardsForDisplay.FirstOrDefault()?.Timestamp;
+
+                lastUpdatedTimestampData.TransfersTimestamps[profileName] = lastUpdatedTimestampDataForProfile;
+
+                Preferences.Default.Set<string>(profileName + "_LastUpdatedTimestampData", lastUpdatedTimestampData.Serialize()); ;
             }
 
             Application.Current.Dispatcher.Dispatch(() =>
