@@ -15,9 +15,9 @@ namespace LatokenMauiClient
         private bool isRewardDurationEditable = true;
 
 
-        [ObservableProperty] 
+        [ObservableProperty]
         private Profile userProfile;
-        
+
         public RewardsAndAirdropsViewModel(ICurrencyCache currencyCache)
         {
             this.currencyCache = currencyCache;
@@ -33,6 +33,12 @@ namespace LatokenMauiClient
                 this.userProfile = profile;
                 this.restClient = new LatokenRestClient(profile.ApiKey, profile.ApiSecret);
             }
+        }
+
+        internal void InitializeProfileAndRestClient(Profile profile)
+        {
+            this.userProfile = profile;
+            this.restClient = new LatokenRestClient(profile.ApiKey, profile.ApiSecret);
         }
 
         public IEnumerable<TransferDto> GetTradingCompetitionRewards()
