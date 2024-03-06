@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LatokenMauiClient.SellPage"
+             Loaded="ContentPage_Loaded"
+             Title="Sell">
+    <RefreshView IsRefreshing="{Binding IsRefreshing}" Refreshing="RefreshView_Refreshing">
+        <ScrollView>
+            <VerticalStackLayout>
+                <HorizontalStackLayout VerticalOptions="Start" HorizontalOptions="Center">
+                    <Label Text="Sell" Margin="0,0,10,0"/>
+                    <Label Text="{Binding BalanceDto.CurrencySymbol}"/>
+                </HorizontalStackLayout>
+
+                <Button x:Name="RefreshButton" Margin="5" Text="Refresh" Clicked="RefreshButton_Clicked" />
+                <!--<ActivityIndicator x:Name="BusyIndicator"  IsRunning="True" />-->
+
+                <Grid x:Name="OrderBookGrid" Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0"
+                Grid.Column="0"
+                Text=" Price"
+                x:Name="TimeStampColumnHeader"
+                Padding="4"
+                FontAttributes="Bold"/>
+                    <Label Grid.Row="0"
+                 Grid.Column="1"
+                 Text="Quantity"
+                 x:Name="AssetHeader"
+                 Padding="4"
+                 FontAttributes="Bold" 
+                 HorizontalTextAlignment="Center"/>
+                    <Label Grid.Row="0"
+                 Grid.Column="2"
+                 Text="Accumulated"
+                 x:Name="TransferringFundsColumnHeader"
+                 Padding="4"
+                 FontAttributes="Bold"/>
+                </Grid>
+                <Border StrokeThickness="2" Stroke="Red" Background="LightPink" Padding="10" Margin="10" >
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+
+                        <Label Grid.Row="0"
+                          Grid.Column="0"
+                          Text="Sell"
+                          TextColor="Red"
+                          Padding="4"
+                          FontAttributes="Bold" />
+                        <Label Grid.Row="1"
+                          Grid.Column="0"
+                          Text="Price in USDT"
+                          Padding="4"
+                          FontAttributes="Bold" />
+                        <Editor Grid.Row="2"
+                          Grid.Column="0"
+                          Text="{Binding SelectedPrice, StringFormat='{0:D29}'}" />
+                        <Label Grid.Row="3"
+                          Grid.Column="0"
+                          Text="Sell Amount"
+                          Padding="4"
+                          FontAttributes="Bold" />
+                        <Editor Grid.Row="4"
+                          Grid.Column="0"
+                          Text="{Binding SelectedQuantity, StringFormat='{0:G29}'}"
+                          />
+                        <Slider Value="{Binding SellAmountPercent}" ValueChanged="Slider_ValueChanged"  Grid.Row="5" Grid.Column="0" Minimum="0" Maximum="100"/>
+                        <Grid Margin="10"
+                            Grid.Row="6"
+                            Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Text="25%" BackgroundColor="HotPink" Grid.Column="0" Padding="0" Margin="0" FontSize="10" Clicked="Price25PercentButton_Clicked"/>
+                            <Button Text="50%" BackgroundColor="HotPink" Grid.Column="1" Padding="0" Margin="0" FontSize="10" Clicked="Price50PercentButton_Clicked"/>
+                            <Button Text="75%" BackgroundColor="HotPink" Grid.Column="2" Padding="0" Margin="0" FontSize="10" Clicked="Price75PercentButton_Clicked"/>
+                            <Button Text="100%" BackgroundColor="HotPink" Grid.Column="3" Padding="0" Margin="0" FontSize="10" Clicked="Price100PercentButton_Clicked"/>
+                        </Grid>
+                        <Label Grid.Row="0"
+                          Grid.Column="2"
+                      Text="Balances"
+                      Padding="4"
+                      FontAttributes="Bold" />
+                        <HorizontalStackLayout Grid.Row="1"
+                          Grid.Column="2">
+                            <Label 
+                          Text="Wallet : "
+                          Padding="4"/>
+                            <Label 
+                          Text="{Binding AvailableWalletBalance, StringFormat='{0:G29}'}" 
+                          Padding="4"/>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Grid.Row="2"
+                          Grid.Column="2">
+                            <Label 
+                          Text="Spot : "
+                          Padding="4"/>
+                            <Label 
+                          Text="{Binding AvailableSpotBalance, StringFormat='{0:G29}'}" 
+                          Padding="4"/>
+                        </HorizontalStackLayout>
+                        <Button Text="Sell" 
+                            IsEnabled="{Binding IsSellEnabled}"
+                            Clicked="SellButton_Clicked"
+                          Margin="10"
+                          Grid.Row="6" 
+                          Grid.Column="2"/>
+
+                        <Label Grid.Row="3"
+                           Grid.Column="2"
+                           Text="Total USDT value"
+                           Padding="4"
+                           FontAttributes="Bold" />
+                        <Label Grid.Row="4"
+                          Grid.Column="2"
+                          Text="{Binding TotalUsdtValue, StringFormat='{0:G29}'}" Margin="10,0,0,0"/>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

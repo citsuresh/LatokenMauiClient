@@ -7,75 +7,77 @@
         <local:ProfileTitle></local:ProfileTitle>
     </Shell.TitleView>
     <ContentPage.Content>
-        <ScrollView>
-            <VerticalStackLayout
+        <RefreshView IsRefreshing="{Binding IsRefreshing}" Refreshing="RefreshView_Refreshing">
+            <ScrollView>
+                <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
-                <Button x:Name="RefreshButton" Text="Refresh" Clicked="RefreshButton_Clicked" />
-                <ActivityIndicator x:Name="BusyIndicator"  IsRunning="True" />
-                <Label
+                    <Button x:Name="RefreshButton" Text="Refresh" Clicked="RefreshButton_Clicked" />
+                    <!--<ActivityIndicator x:Name="BusyIndicator"  IsRunning="True" />-->
+                    <Label
                 Text="Rewards/Airdrops"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
-                <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                    <Label
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                        <Label
                         Text="for the last"
                         Margin="10,0,10,0"
                         Style="{StaticResource SubHeadline}"
                         SemanticProperties.HeadingLevel="Level2" />
-                    <Editor WidthRequest="60"
+                        <Editor WidthRequest="60"
                             HorizontalTextAlignment="Center"
                             Text="{Binding RewardDuration}"
                             IsEnabled="{Binding IsRewardDurationEditable}"
                             FontSize="16"
                             FontAttributes="Bold"/>
-                    <Label
+                        <Label
                         Text="days"
                         Margin="10,0,10,0"
                         Style="{StaticResource SubHeadline}"
                         SemanticProperties.HeadingLevel="Level2" />
-                </StackLayout>
-                
-                <Border>
+                    </StackLayout>
 
-                    <Grid x:Name="TradingCompetitionRewardsGrid">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Label Grid.Row="0"
+                    <Border>
+
+                        <Grid x:Name="TradingCompetitionRewardsGrid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0"
                          Grid.Column="0"
                          Text=" Time"
                          x:Name="TimeStampColumnHeader"
                          Padding="4"
                          FontAttributes="Bold"/>
-                        <Label Grid.Row="0"
+                            <Label Grid.Row="0"
                          Grid.Column="1"
                          Text="Asset"
                          x:Name="AssetHeader"
                          Padding="4"
                          FontAttributes="Bold" 
                          HorizontalTextAlignment="Center"/>
-                        <Label Grid.Row="0"
+                            <Label Grid.Row="0"
                          Grid.Column="2"
                          Text="Amount"
                          x:Name="TransferringFundsColumnHeader"
                          Padding="4"
                          FontAttributes="Bold"/>
-                        <Label Grid.Row="0"
+                            <Label Grid.Row="0"
                          Grid.Column="3"
                          Text="USD Value"
                          x:Name="UsdValueColumnHeader"
                          Padding="4"
                          FontAttributes="Bold"/>
-                    </Grid>
-                </Border>
-            </VerticalStackLayout>
-        </ScrollView>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
     </ContentPage.Content>
 </ContentPage>

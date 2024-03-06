@@ -5,14 +5,20 @@ namespace LatokenMauiClient
 {
     public partial class RewardsAndAirdropsViewModel : ObservableObject
     {
-        private LatokenRestClient restClient;
+        [ObservableProperty]
         private ICurrencyCache currencyCache;
+
+        [ObservableProperty]
+        private LatokenRestClient restClient;
 
         [ObservableProperty]
         private int rewardDuration = 10;
 
         [ObservableProperty]
         private bool isRewardDurationEditable = true;
+
+        [ObservableProperty]
+        private bool isRefreshing;
 
 
         [ObservableProperty]

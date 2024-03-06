@@ -5,11 +5,13 @@ namespace LatokenMauiClient
     public partial class RewardsAndAirdropsPage : ContentPage
     {
         private bool isFirstVisit = true;
+        private IServiceProvider serviceProvider;
 
         public RewardsAndAirdropsViewModel ViewModel { get; set; }
 
-        public RewardsAndAirdropsPage(RewardsAndAirdropsViewModel viewModel)
+        public RewardsAndAirdropsPage(RewardsAndAirdropsViewModel viewModel, IServiceProvider serviceProvider)
         {
+            this.serviceProvider = serviceProvider;
             WeakReferenceMessenger.Default.Register<SelectedProfileChangedMessage>(this, this.OnSelectedProfileChangedMessage);
             this.ViewModel = viewModel;
             this.BindingContext = this.ViewModel;
@@ -18,7 +20,7 @@ namespace LatokenMauiClient
 
         private void OnSelectedProfileChangedMessage(object recipient, SelectedProfileChangedMessage message)
         {
-            if (Shell.Current.CurrentPage == this && ViewModel != null && RefreshButton != null )
+            if (Shell.Current.CurrentPage == this && ViewModel != null && RefreshButton != null)
             {
                 this.ViewModel.InitializeProfileAndRestClient();
                 this.OnRefresh();
@@ -49,16 +51,17 @@ namespace LatokenMauiClient
         {
             Application.Current.Dispatcher.Dispatch(() =>
             {
+                this.ViewModel.IsRefreshing = true;
                 this.ViewModel.IsRewardDurationEditable = false;
-                BusyIndicator.IsVisible = true;
-                BusyIndicator.IsRunning = true;
+                //BusyIndicator.IsVisible = true;
+                //BusyIndicator.IsRunning = true;
                 TradingCompetitionRewardsGrid.IsEnabled = false;
                 TradingCompetitionRewardsGrid.Children.Clear();
                 TradingCompetitionRewardsGrid.RowDefinitions.Clear();
                 AddHeaderRow();
             });
 
-            if(this.ViewModel.UserProfile == null)
+            if (this.ViewModel.UserProfile == null)
             {
                 this.ViewModel.InitializeProfileAndRestClient();
             }
@@ -92,7 +95,7 @@ namespace LatokenMauiClient
 
             var rewardsForDisplay = this.ViewModel.GetTradingCompetitionRewards();
             int index = 1;
-            
+
             foreach (var competitionReward in rewardsForDisplay)
             {
                 var timeStampLabel = new Label();
@@ -114,12 +117,29 @@ namespace LatokenMauiClient
                 transferringFundsLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
                 transferringFundsLabel.SetValue(Label.TextProperty, competitionReward.TransferringFunds);
 
+                var verticalLayout = new VerticalStackLayout();
+                verticalLayout.SetValue(Grid.RowProperty, index);
+                verticalLayout.SetValue(Grid.ColumnProperty, 3);
+                verticalLayout.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+
                 var usdValueLabel = new Label();
-                usdValueLabel.SetValue(Grid.RowProperty, index);
-                usdValueLabel.SetValue(Grid.ColumnProperty, 3);
+                //usdValueLabel.SetValue(Grid.RowProperty, index);
+                //usdValueLabel.SetValue(Grid.ColumnProperty, 3);
                 usdValueLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
                 usdValueLabel.SetValue(Label.TextProperty, competitionReward.UsdValue);
-                
+
+                var sellButton = new Button();
+                //sellButton.SetValue(Grid.RowProperty, index);
+                //sellButton.SetValue(Grid.ColumnProperty, 3);
+                sellButton.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+                sellButton.SetValue(Button.TextProperty, "Sell");
+                //sellButton.SetValue(Button.HeightRequestProperty, 30);
+                sellButton.Clicked += SellButton_Clicked;
+                sellButton.SetValue(Button.BindingContextProperty, competitionReward);
+                verticalLayout.Children.Add(usdValueLabel);
+                verticalLayout.Children.Add(sellButton);
+
+
                 if (lastUpdatedTimestampDataForProfile != null && (lastUpdatedTimestampDataForProfile.LastUpdatedRewardsAirdropsTimeStamp == null
                     || competitionReward.Timestamp > lastUpdatedTimestampDataForProfile.LastUpdatedRewardsAirdropsTimeStamp))
                 {
@@ -139,7 +159,9 @@ namespace LatokenMauiClient
                     TradingCompetitionRewardsGrid.Children.Add(timeStampLabel);
                     TradingCompetitionRewardsGrid.Children.Add(assetLabel);
                     TradingCompetitionRewardsGrid.Children.Add(transferringFundsLabel);
-                    TradingCompetitionRewardsGrid.Children.Add(usdValueLabel);
+                    TradingCompetitionRewardsGrid.Children.Add(verticalLayout);
+                    //TradingCompetitionRewardsGrid.Children.Add(usdValueLabel);
+                    //TradingCompetitionRewardsGrid.Children.Add(sellButton);
                 });
                 index++;
             }
@@ -156,12 +178,48 @@ namespace LatokenMauiClient
             Application.Current.Dispatcher.Dispatch(() =>
             {
                 this.ViewModel.IsRewardDurationEditable = true;
-                BusyIndicator.IsVisible = false;
-                BusyIndicator.IsRunning = false;
+                //BusyIndicator.IsVisible = false;
+                //BusyIndicator.IsRunning = false;
                 TradingCompetitionRewardsGrid.IsEnabled = true;
                 RefreshButton.Text = "Refresh";
                 RefreshButton.IsEnabled = true;
+                this.ViewModel.IsRefreshing = false;
             });
+        }
+
+        private void SellButton_Clicked(object? sender, EventArgs e)
+        {
+            var button = sender as Button;
+            var transferDto = button?.BindingContext as TransferDto;
+            if (transferDto != null)
+            {
+                var balanceDto = this.ViewModel.RestClient?.GetWalletBalanceByCurrency(transferDto.Currency);
+                if (balanceDto != null)
+                {
+                    this.LaunchSellWindow(this.ViewModel.UserProfile, balanceDto);
+                }
+            }
+        }
+
+        private void LaunchSellWindow(Profile userProfile, BalanceDto balanceDto)
+        {
+            var availablePairs = this.ViewModel.CurrencyCache.AvailablePairs.Where(p => p.BaseCurrencyId == balanceDto.CurrencyId).ToList();
+            if (!availablePairs.Any())
+            {
+                this.DisplayAlert("No Trading Pair", $"No Matching Trading pair available.", "OK", "Cancel", FlowDirection.LeftToRight);
+            }
+            else
+            {
+                if (balanceDto.CurrencySymbol == null) // This is null when launched from Transfers view
+                {
+                    balanceDto.CurrencySymbol = this.ViewModel.CurrencyCache.AvailableCurrencies.FirstOrDefault(c => c.Id == balanceDto.CurrencyId)?.Symbol;
+                }
+
+
+                var sellPage = new SellPage(new SellViewModel(serviceProvider));
+                sellPage.Initialize(userProfile, this.ViewModel.RestClient, this.ViewModel.CurrencyCache, availablePairs.First(), balanceDto);
+                Navigation.PushAsync(sellPage);
+            }
         }
 
         private void AddHeaderRow()
@@ -204,6 +262,11 @@ namespace LatokenMauiClient
             TradingCompetitionRewardsGrid.Children.Add(assetLabel);
             TradingCompetitionRewardsGrid.Children.Add(transferringFundsLabel);
             TradingCompetitionRewardsGrid.Children.Add(usdValueLabel);
+        }
+
+        private void RefreshView_Refreshing(object sender, EventArgs e)
+        {
+            this.OnRefresh();
         }
     }
 
