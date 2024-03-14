@@ -74,6 +74,7 @@ namespace LatokenMauiClient
 
         private IServiceProvider serviceProvider;
         public Action RefreshCallback;
+        private bool isSellInProgress;
 
         public decimal AvailableWalletBalance
         {
@@ -189,7 +190,7 @@ namespace LatokenMauiClient
 
         public void UpdateSellEnabled()
         {
-            this.IsSellEnabled = this.SelectedQuantity > 0 && this.SelectedPrice > 0;
+            this.IsSellEnabled = !this.isSellInProgress && this.SelectedQuantity > 0 && this.SelectedPrice > 0;
         }
 
         private void UpdateTotalUsdtValue()
@@ -205,12 +206,13 @@ namespace LatokenMauiClient
         internal decimal GetAccumulatedQuantityForBidPrice(PriceLevelDto priceLevelDto)
         {
             decimal accumulatedQuantity = 0;
-            if (this.Orderbook != null && this.Orderbook.Bid.Contains(priceLevelDto))
+            var matchedBid = this.Orderbook.Bid.FirstOrDefault(bid => bid.Price == priceLevelDto.Price && bid.Quantity == priceLevelDto.Quantity && bid.Accumulated == priceLevelDto.Accumulated);
+            if (this.Orderbook != null && matchedBid != null)
             {
                 foreach (var bid in this.Orderbook.Bid)
                 {
                     accumulatedQuantity += bid.Quantity;
-                    if (bid == priceLevelDto)
+                    if (bid == matchedBid)
                     {
                         break;
                     }
@@ -222,12 +224,16 @@ namespace LatokenMauiClient
 
         internal void PlaceSellOrder()
         {
+            this.isSellInProgress = true;
+            this.UpdateSellEnabled();
             var alertService = this.serviceProvider.GetService<IAlertService>();
             if (this.SelectedPrice > 0 && this.SelectedQuantity > 0)
             {
                 if (this.SpotBalance == null || this.WalletBalance == null)
                 {
                     alertService.ShowAlert("Error", $"Unable to get Spot and Wallet Balance values");
+                    this.isSellInProgress = false;
+                    this.UpdateSellEnabled();
                     return;
                 }
 
@@ -243,11 +249,16 @@ namespace LatokenMauiClient
                         Thread.Sleep(300);
                         this.RefreshBalances();
                         this.PlaceSellOrder();
+                        this.isSellInProgress = false;
+                        this.UpdateSellEnabled();
                         return;
                     }
                     else
                     {
                         alertService.ShowAlert("Error", $"Not enough quantity of {this.BalanceDto.CurrencySymbol} available for sell.\nSpot Balance = {this.SpotBalance.Available}\nWallet Balance = {this.WalletBalance.Available}");
+
+                        this.isSellInProgress = false;
+                        this.UpdateSellEnabled();
                         return;
                     }
                 }
@@ -263,9 +274,14 @@ namespace LatokenMauiClient
                         alertService.ShowAlert("Error", errorMessage);
                     }
 
+                    this.isSellInProgress = false;
+                    this.UpdateSellEnabled();
                     this.RefreshCallback();
                 }
             }
+
+            this.isSellInProgress = false;
+            this.UpdateSellEnabled();
         }
         private bool PlaceOrder(PairDto selectedTradingPair, bool isBuyOrder, decimal price, decimal quantity, ref string errorMessage)
         {

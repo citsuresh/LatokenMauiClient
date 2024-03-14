@@ -35,19 +35,18 @@ public partial class SellPage : ContentPage
     {
         RefreshButton.Text = "Refreshing...";
         RefreshButton.IsEnabled = false;
-        Task.Run(() => RefreshPage());
+        RefreshPage();
     }
 
     public void RefreshPage()
     {
         Application.Current.Dispatcher.Dispatch(() =>
         {
-            this.ViewModel.IsRefreshing = true;
             //BusyIndicator.IsVisible = true;
             //BusyIndicator.IsRunning = true;
             OrderBookGrid.IsEnabled = false;
-            //OrderBookGrid.Children.Clear();
-            //OrderBookGrid.RowDefinitions.Clear();
+            OrderBookGrid.Children.Clear();
+            OrderBookGrid.RowDefinitions.Clear();
             this.ViewModel.IsSellEnabled = false;
             AddHeaderRow();
         });
@@ -57,6 +56,13 @@ public partial class SellPage : ContentPage
         var orderbook = this.ViewModel.FetchOrderBook();
         if (orderbook != null)
         {
+            for (int i = 0;i<14;i++)
+            {
+                priceLables[i] = null;
+                quantityLabels[i] = null;
+                accumulatedLabels[i] = null;
+            }
+
             int index = 1;
             foreach (var ask in orderbook.Ask)
             {
@@ -86,9 +92,19 @@ public partial class SellPage : ContentPage
                 AddOrUpdateRow(bid, index++, false);
             }
 
-            if(this.ViewModel.SelectedPrice == 0 && this.ViewModel.Orderbook.Bid.Any())
+            if (this.ViewModel.SelectedPrice == 0 && this.ViewModel.Orderbook.Bid.Any())
             {
                 this.SetPriceFromBid(this.ViewModel.Orderbook.Bid.First());
+            }
+            else
+            {
+                if(this.ViewModel.Orderbook != null 
+                    && this.ViewModel.Orderbook.Bid.Any() 
+                    && this.ViewModel.Orderbook.Bid.First().Price != this.ViewModel.SelectedPrice
+                    && this.ViewModel.Orderbook.Bid.First().Quantity != this.ViewModel.SelectedQuantity)
+                {
+                    this.SetPriceFromBid(this.ViewModel.Orderbook.Bid.First());
+                }
             }
         }
 

@@ -156,6 +156,7 @@ namespace LatokenMauiClient
                 Application.Current.Dispatcher.Dispatch(() =>
                 {
                     TradingCompetitionRewardsGrid.RowDefinitions.Add(new RowDefinition());
+                    Thread.Sleep(100);
                     TradingCompetitionRewardsGrid.Children.Add(timeStampLabel);
                     TradingCompetitionRewardsGrid.Children.Add(assetLabel);
                     TradingCompetitionRewardsGrid.Children.Add(transferringFundsLabel);
@@ -212,7 +213,7 @@ namespace LatokenMauiClient
             {
                 if (balanceDto.CurrencySymbol == null) // This is null when launched from Transfers view
                 {
-                    balanceDto.CurrencySymbol = this.ViewModel.CurrencyCache.AvailableCurrencies.FirstOrDefault(c => c.Id == balanceDto.CurrencyId)?.Symbol;
+                    balanceDto.CurrencySymbol = this.ViewModel.CurrencyCache.AvailableCurrencies.FirstOrDefault(c => c?.Id == balanceDto.CurrencyId)?.Symbol;
                 }
 
 

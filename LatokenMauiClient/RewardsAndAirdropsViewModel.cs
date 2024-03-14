@@ -93,7 +93,7 @@ namespace LatokenMauiClient
                         transferInfo.Status = transferInfo.Status.Replace("TRANSFER_STATUS_", "");
                         transferInfo.Type = transferInfo.Type.Replace("TRANSFER_TYPE_", "");
 
-                        transferInfo.CurrencySymbol = this.currencyCache.AvailableCurrencies.FirstOrDefault(c => c.Id == transferInfo.Currency)?.Symbol;
+                        transferInfo.CurrencySymbol = this.currencyCache.AvailableCurrencies.FirstOrDefault(c => c?.Id == transferInfo.Currency)?.Symbol;
                         if (string.IsNullOrEmpty(transferInfo.CurrencySymbol))
                         {
                             //TODO: cannot resolve currency

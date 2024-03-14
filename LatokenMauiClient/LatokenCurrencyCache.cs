@@ -109,7 +109,7 @@
 
         public CurrencyDto? GetCurrencyById(string currencyId)
         {
-            return this.AvailableCurrencies.FirstOrDefault(curr => curr.Id == currencyId);
+            return this.AvailableCurrencies.FirstOrDefault(curr => curr?.Id == currencyId);
         }
 
         public void RefreshCache()
