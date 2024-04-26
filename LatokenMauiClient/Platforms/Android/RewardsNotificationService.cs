@@ -122,6 +122,7 @@ namespace LatokenMauiClient.Platforms.Android
                     Task.WaitAll(tasks.ToArray());
 
                     var notificationMessage = string.Empty;
+                    var totalNewRewards = 0;
                     foreach (var task in tasks)
                     {
                         var profileRewards = ((Profile, IEnumerable<TransferDto>))task.Result;
@@ -159,6 +160,7 @@ namespace LatokenMauiClient.Platforms.Android
                             if (lastUpdatedTimestampDataForProfile != null && (lastUpdatedTimestampDataForProfile.LastUpdatedRewardsAirdropsTimeStamp == null
                             || competitionReward.Timestamp > lastUpdatedTimestampDataForProfile.LastUpdatedRewardsAirdropsTimeStamp))
                             {
+                                totalNewRewards++;
                                 rewardsString += $"\n\t{competitionReward.CurrencySymbol} - {competitionReward.UsdValue} USDT";
                             }
                         }
@@ -172,21 +174,21 @@ namespace LatokenMauiClient.Platforms.Android
                     if (string.IsNullOrEmpty(notificationMessage))
                     {
                         string message = $"Checked rewards {counter} times\nNo new rewards since you last checked!";
-                        var notification = CreateUpdatedNotification("Running in the background", message);
+                        var notification = CreateUpdatedNotification("Running in the background. No New Rewards!", message);
                         StartForeground(ServiceNotificationId, notification);
                     }
                     else
                     {
                         // Display a notification
                         string message = $"Checked rewards {counter} times\n{notificationMessage}";
-                        var notification = CreateUpdatedNotification("Running in the background", message);
+                        var notification = CreateUpdatedNotification($"Running in the background. {totalNewRewards} New Rewards!\"", message);
                         StartForeground(ServiceNotificationId, notification);
                     }
                 }
                 catch (Exception ex)
                 {
                     string message = "Error while checking for new rewards!\n" + ex.Message;
-                    var notification = CreateUpdatedNotification("Running in the background", message);
+                    var notification = CreateUpdatedNotification("Running in the background. Error Occurred!", message);
                     StartForeground(ServiceNotificationId, notification);
                 }
             }
