@@ -43,6 +43,8 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
+		<MauiImage Include="Platforms\Android\drawable\latoken.png" />
+		<MauiImage Include="Platforms\Android\drawable\refresh_image.png" />
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 
 		<!-- Splash Screen -->
@@ -61,6 +63,8 @@
 
 	<ItemGroup>
 	  <None Remove="appsettings.json" />
+	  <None Remove="Platforms\Android\drawable\latoken.png" />
+	  <None Remove="Platforms\Android\drawable\refresh_image.png" />
 	</ItemGroup>
 
 	<ItemGroup>

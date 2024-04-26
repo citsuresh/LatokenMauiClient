@@ -11,6 +11,7 @@ namespace LatokenMauiClient.Platforms.Android
     {
         public const int ServiceNotificationId = 1001;
         private const string ChannelId = "MyForegroundServiceChannel";
+        private const string EXTRA_REFRESH = "refresh";
         private CancellationTokenSource cancellationTokenSource;
         private Timer rewardsCheckTimer;
         private const int intervalMinutes = 15; // Run every 15 minutes
@@ -26,7 +27,7 @@ namespace LatokenMauiClient.Platforms.Android
         public override StartCommandResult OnStartCommand(Intent intent, StartCommandFlags flags, int startId)
         {
             cancellationTokenSource = new CancellationTokenSource();
-            rewardsCheckTimer = new Timer(CheckForNewRewards, null, TimeSpan.Zero, TimeSpan.FromMinutes(intervalMinutes));
+
 
             CreateNotificationChannel();
             var notification = CreateInitialNotification();
@@ -35,7 +36,16 @@ namespace LatokenMauiClient.Platforms.Android
             //var notificationManager = NotificationManagerCompat.From(this);
             //notificationManager.Notify(0, notification);
 
-
+            if (intent?.GetBooleanExtra(EXTRA_REFRESH, false) == true)
+            {
+                // The "Refresh" notification button was clicked
+                CheckForNewRewards(null);
+            }
+            else
+            {
+                rewardsCheckTimer?.Dispose();
+                rewardsCheckTimer = new Timer(CheckForNewRewards, null, TimeSpan.Zero, TimeSpan.FromMinutes(intervalMinutes));
+            }
 
             return StartCommandResult.Sticky;
         }
@@ -51,7 +61,7 @@ namespace LatokenMauiClient.Platforms.Android
         {
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
-                var channel = new NotificationChannel(ChannelId, "Foreground Service", NotificationImportance.Default);
+                var channel = new NotificationChannel(ChannelId, "Foreground Service", NotificationImportance.Max);
                 var notificationManager = (NotificationManager)GetSystemService(NotificationService);
                 notificationManager.CreateNotificationChannel(channel);
             }
@@ -70,32 +80,38 @@ namespace LatokenMauiClient.Platforms.Android
             var notification = new NotificationCompat.Builder(this, ChannelId)
                 .SetContentTitle("Listening for new Rewards")
                 .SetContentText("Running in the background")
-                .SetSmallIcon(Resource.Drawable.searchicon)
+                .SetSmallIcon(Resource.Drawable.latoken)
                 .SetOngoing(true)
                 .SetStyle(new NotificationCompat.BigTextStyle().BigText("Running in the background"))
                 //.SetContentIntent(pendingIntent)
+                //.AddAction(action1)
+                .SetPriority(NotificationCompat.PriorityHigh)
                 .Build();
-
             return notification;
         }
 
         private Notification CreateUpdatedNotification(string text, string expandedText)
         {
-            //var intent = new Intent(Intent.ActionView);
-            //intent.SetData(Uri.Parse("//rewardsAndAirdrops"));
 
-            //var intent = new Intent(this, typeof(MainActivity));
-            //intent.PutExtra("tabName", "rewardsAndAirdrops"); // Replace with your tab name
+            var refreshActionIntent = new Intent(this, typeof(MyForegroundService));
+            refreshActionIntent.PutExtra(EXTRA_REFRESH, true);
+            var refreshActionPendingIntent = PendingIntent.GetService(
+                                                        this,
+                                                        0,
+                                                        refreshActionIntent,
+                                                        PendingIntentFlags.Immutable);
 
-            //var pendingIntent = PendingIntent.GetActivity(this, 0, intent, PendingIntentFlags.UpdateCurrent);
+
+            var refreshAction = new NotificationCompat.Action.Builder(Resource.Drawable.refresh_image, "Refresh", refreshActionPendingIntent).Build();
 
             var notification = new NotificationCompat.Builder(this, ChannelId)
                 .SetContentTitle("Listening for new Rewards")
                 .SetContentText(text)
-                .SetSmallIcon(Resource.Drawable.searchicon)
+                .SetSmallIcon(Resource.Drawable.latoken)
                 .SetOngoing(true)
                 .SetStyle(new NotificationCompat.BigTextStyle().BigText(expandedText))
-                //.SetContentIntent(pendingIntent)
+                .AddAction(refreshAction)
+                .SetPriority(NotificationCompat.PriorityHigh)
                 .Build();
 
             return notification;
