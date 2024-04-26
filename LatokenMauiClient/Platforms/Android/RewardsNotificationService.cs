@@ -10,7 +10,9 @@ namespace LatokenMauiClient.Platforms.Android
     public class MyForegroundService : Service
     {
         public const int ServiceNotificationId = 1001;
-        private const string ChannelId = "MyForegroundServiceChannel";
+        private const string NormalNotificationChannelId = "NormalNotificationChannel";
+        private const string NewRewardsNotificationChannelId = "NewRewardsNotificationChannel";
+        private const string ErrorNotificationChannelId = "ErrorNotificationChannel";
         private const string EXTRA_REFRESH = "refresh";
         private CancellationTokenSource cancellationTokenSource;
         private Timer rewardsCheckTimer;
@@ -61,9 +63,17 @@ namespace LatokenMauiClient.Platforms.Android
         {
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
-                var channel = new NotificationChannel(ChannelId, "Foreground Service", NotificationImportance.Max);
+                var channel = new NotificationChannel(NormalNotificationChannelId, "Other Notifications", NotificationImportance.Max);
                 var notificationManager = (NotificationManager)GetSystemService(NotificationService);
                 notificationManager.CreateNotificationChannel(channel);
+
+                var channel2 = new NotificationChannel(NewRewardsNotificationChannelId, "New Rewards", NotificationImportance.Max);
+                var notificationManager2 = (NotificationManager)GetSystemService(NotificationService);
+                notificationManager2.CreateNotificationChannel(channel2);
+
+                var channel3 = new NotificationChannel(ErrorNotificationChannelId, "Error", NotificationImportance.Max);
+                var notificationManager3 = (NotificationManager)GetSystemService(NotificationService);
+                notificationManager3.CreateNotificationChannel(channel3);
             }
         }
 
@@ -77,7 +87,7 @@ namespace LatokenMauiClient.Platforms.Android
 
             //var pendingIntent = PendingIntent.GetActivity(this, 0, intent, PendingIntentFlags.UpdateCurrent);
 
-            var notification = new NotificationCompat.Builder(this, ChannelId)
+            var notification = new NotificationCompat.Builder(this, NormalNotificationChannelId)
                 .SetContentTitle("Listening for new Rewards")
                 .SetContentText("Running in the background")
                 .SetSmallIcon(Resource.Drawable.latoken)
@@ -90,7 +100,7 @@ namespace LatokenMauiClient.Platforms.Android
             return notification;
         }
 
-        private Notification CreateUpdatedNotification(string text, string expandedText)
+        private Notification CreateUpdatedNotification(string channelId, string text, string expandedText)
         {
 
             var refreshActionIntent = new Intent(this, typeof(MyForegroundService));
@@ -104,7 +114,7 @@ namespace LatokenMauiClient.Platforms.Android
 
             var refreshAction = new NotificationCompat.Action.Builder(Resource.Drawable.refresh_image, "Refresh", refreshActionPendingIntent).Build();
 
-            var notification = new NotificationCompat.Builder(this, ChannelId)
+            var notification = new NotificationCompat.Builder(this, channelId)
                 .SetContentTitle("Listening for new Rewards")
                 .SetContentText(text)
                 .SetSmallIcon(Resource.Drawable.latoken)
@@ -190,21 +200,21 @@ namespace LatokenMauiClient.Platforms.Android
                     if (string.IsNullOrEmpty(notificationMessage))
                     {
                         string message = $"Checked rewards {counter} times\nNo new rewards since you last checked!";
-                        var notification = CreateUpdatedNotification("Running in the background. No New Rewards!", message);
+                        var notification = CreateUpdatedNotification(NormalNotificationChannelId, "Running in the background. No New Rewards!", message);
                         StartForeground(ServiceNotificationId, notification);
                     }
                     else
                     {
                         // Display a notification
                         string message = $"Checked rewards {counter} times\n{notificationMessage}";
-                        var notification = CreateUpdatedNotification($"Running in the background. {totalNewRewards} New Rewards!\"", message);
+                        var notification = CreateUpdatedNotification(NewRewardsNotificationChannelId, $"Running in the background. {totalNewRewards} New Rewards!\"", message);
                         StartForeground(ServiceNotificationId, notification);
                     }
                 }
                 catch (Exception ex)
                 {
                     string message = "Error while checking for new rewards!\n" + ex.Message;
-                    var notification = CreateUpdatedNotification("Running in the background. Error Occurred!", message);
+                    var notification = CreateUpdatedNotification(ErrorNotificationChannelId, "Running in the background. Error Occurred!", message);
                     StartForeground(ServiceNotificationId, notification);
                 }
             }
