@@ -12,6 +12,7 @@ namespace LatokenMauiClient.Platforms.Android
         public const int ServiceNotificationId = 1001;
         private const string NormalNotificationChannelId = "NormalNotificationChannel";
         private const string NewRewardsNotificationChannelId = "NewRewardsNotificationChannel";
+        private const string NewTradingCompetitionsNotificationChannelId = "NewTradingCompetitionsNotificationChannel";
         private const string ErrorNotificationChannelId = "ErrorNotificationChannel";
         private const string EXTRA_REFRESH = "refresh";
         private CancellationTokenSource cancellationTokenSource;
@@ -19,6 +20,7 @@ namespace LatokenMauiClient.Platforms.Android
         private const int intervalMinutes = 15; // Run every 15 minutes
         private long counter = 0;
         private ICurrencyCache currencyCache;
+        private int consecutiveErrorCount = 0;
 
         public MyForegroundService()
         {
@@ -41,12 +43,12 @@ namespace LatokenMauiClient.Platforms.Android
             if (intent?.GetBooleanExtra(EXTRA_REFRESH, false) == true)
             {
                 // The "Refresh" notification button was clicked
-                CheckForNewRewards(null);
+                CheckForNewRewardsAndCompetitions(null);
             }
             else
             {
                 rewardsCheckTimer?.Dispose();
-                rewardsCheckTimer = new Timer(CheckForNewRewards, null, TimeSpan.Zero, TimeSpan.FromMinutes(intervalMinutes));
+                rewardsCheckTimer = new Timer(CheckForNewRewardsAndCompetitions, null, TimeSpan.Zero, TimeSpan.FromMinutes(intervalMinutes));
             }
 
             return StartCommandResult.Sticky;
@@ -71,9 +73,13 @@ namespace LatokenMauiClient.Platforms.Android
                 var notificationManager2 = (NotificationManager)GetSystemService(NotificationService);
                 notificationManager2.CreateNotificationChannel(channel2);
 
-                var channel3 = new NotificationChannel(ErrorNotificationChannelId, "Error", NotificationImportance.Max);
+                var channel3 = new NotificationChannel(NewTradingCompetitionsNotificationChannelId, "New Trading Competitions", NotificationImportance.Max);
                 var notificationManager3 = (NotificationManager)GetSystemService(NotificationService);
                 notificationManager3.CreateNotificationChannel(channel3);
+
+                var channel4 = new NotificationChannel(ErrorNotificationChannelId, "Error", NotificationImportance.Max);
+                var notificationManager4 = (NotificationManager)GetSystemService(NotificationService);
+                notificationManager4.CreateNotificationChannel(channel4);
             }
         }
 
@@ -88,7 +94,7 @@ namespace LatokenMauiClient.Platforms.Android
             //var pendingIntent = PendingIntent.GetActivity(this, 0, intent, PendingIntentFlags.UpdateCurrent);
 
             var notification = new NotificationCompat.Builder(this, NormalNotificationChannelId)
-                .SetContentTitle("Listening for new Rewards")
+                .SetContentTitle("Listening for new Rewards and Competitions")
                 .SetContentText("Running in the background")
                 .SetSmallIcon(Resource.Drawable.latoken)
                 .SetOngoing(true)
@@ -113,9 +119,9 @@ namespace LatokenMauiClient.Platforms.Android
 
 
             var refreshAction = new NotificationCompat.Action.Builder(Resource.Drawable.refresh_image, "Refresh", refreshActionPendingIntent).Build();
-
+            
             var notification = new NotificationCompat.Builder(this, channelId)
-                .SetContentTitle("Listening for new Rewards")
+                .SetContentTitle("Listening for new Rewards and Competitions")
                 .SetContentText(text)
                 .SetSmallIcon(Resource.Drawable.latoken)
                 .SetOngoing(true)
@@ -129,13 +135,28 @@ namespace LatokenMauiClient.Platforms.Android
 
 
 
-        private void CheckForNewRewards(object? state)
+        private void CheckForNewRewardsAndCompetitions(object? state)
         {
             if (!cancellationTokenSource.IsCancellationRequested)
             {
                 try
                 {
                     counter++;
+
+                    var tradingCompetitions = this.GetTradingCompetitions();
+
+                    var previousUpdatedTradingCompetitionsString = Preferences.Default.Get<string>("LastUpdatedTradingCompetitions", string.Empty);
+                    var previousUpdatedTradingCompetitions = previousUpdatedTradingCompetitionsString.Split(",");
+
+                    var totalNewCompetitions = 0;
+                    var newTradingCompetitions = tradingCompetitions.Where(c => !previousUpdatedTradingCompetitions.Contains(c.Name));
+
+                    var competitionsNotificationMessage = string.Empty;
+                    if (newTradingCompetitions.Any())
+                    {
+                        totalNewCompetitions = newTradingCompetitions.Count();
+                        competitionsNotificationMessage = "New Trading Competitions : " + string.Join(", ", newTradingCompetitions.Select(c => c.Name));
+                    }
 
                     var profiles = this.GetProfiles();
 
@@ -147,7 +168,7 @@ namespace LatokenMauiClient.Platforms.Android
 
                     Task.WaitAll(tasks.ToArray());
 
-                    var notificationMessage = string.Empty;
+                    var rewardsNotificationMessage = string.Empty;
                     var totalNewRewards = 0;
                     foreach (var task in tasks)
                     {
@@ -193,31 +214,61 @@ namespace LatokenMauiClient.Platforms.Android
 
                         if (!string.IsNullOrEmpty(rewardsString))
                         {
-                            notificationMessage += profile.ProfileName + " - New Rewards:" + rewardsString + "\n";
+                            rewardsNotificationMessage += profile.ProfileName + " - New Rewards:" + rewardsString + "\n";
                         }
                     }
 
-                    if (string.IsNullOrEmpty(notificationMessage))
+                    if (string.IsNullOrEmpty(rewardsNotificationMessage) && string.IsNullOrEmpty(competitionsNotificationMessage))
                     {
-                        string message = $"Checked rewards {counter} times\nNo new rewards since you last checked!";
-                        var notification = CreateUpdatedNotification(NormalNotificationChannelId, "Running in the background. No New Rewards!", message);
+                        string message = $"Checked rewards and competitions {counter} times\nNo new Rewards and Competitions since you last checked!";
+                        var notification = CreateUpdatedNotification(NormalNotificationChannelId, "Running in the background. No New Rewards and Competitions!", message);
                         StartForeground(ServiceNotificationId, notification);
                     }
                     else
                     {
-                        // Display a notification
-                        string message = $"Checked rewards {counter} times\n{notificationMessage}";
-                        var notification = CreateUpdatedNotification(NewRewardsNotificationChannelId, $"Running in the background. {totalNewRewards} New Rewards!\"", message);
-                        StartForeground(ServiceNotificationId, notification);
+                        if (!string.IsNullOrEmpty(rewardsNotificationMessage))
+                        {
+                            // Display a notification
+                            string message = $"Checked rewards and competitions {counter} times\n{rewardsNotificationMessage}";
+                            var notification = CreateUpdatedNotification(NewRewardsNotificationChannelId, $"Running in the background. {totalNewRewards} New Rewards!\"", message);
+                            StartForeground(ServiceNotificationId, notification);
+                        }
+
+                        if (!string.IsNullOrEmpty(competitionsNotificationMessage))
+                        {
+                            // Display a notification
+                            string message = $"Checked rewards and competitions {counter} times\n{competitionsNotificationMessage}";
+                            var notification = CreateUpdatedNotification(NewTradingCompetitionsNotificationChannelId, $"Running in the background. {totalNewCompetitions} New Competitions!\"", message);
+                            StartForeground(ServiceNotificationId, notification);
+                        }
                     }
+
+                    consecutiveErrorCount = 0;
                 }
                 catch (Exception ex)
                 {
+                    consecutiveErrorCount++;
                     string message = "Error while checking for new rewards!\n" + ex.Message;
                     var notification = CreateUpdatedNotification(ErrorNotificationChannelId, "Running in the background. Error Occurred!", message);
                     StartForeground(ServiceNotificationId, notification);
+                    if (consecutiveErrorCount < 3)
+                    {
+                        CheckForNewRewardsAndCompetitions(state);
+                    }
+                    else
+                    {
+                        consecutiveErrorCount = 0;
+                    }
                 }
             }
+        }
+
+        private IEnumerable<TradingCompetitionData> GetTradingCompetitions()
+        {
+            var vm = new TradingCompetitionsViewModel(this.currencyCache);
+            vm.InitializeProfileAndRestClient();
+            var competitions = vm.GetTradingCompetitions();
+            return competitions;
         }
 
         private (Profile, IEnumerable<TransferDto>) GetProfileRewards(Profile profile)

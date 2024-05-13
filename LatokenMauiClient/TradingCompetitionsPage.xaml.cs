@@ -59,11 +59,15 @@ namespace LatokenMauiClient
                 AddHeaderRow();
             });
 
+            var previousUpdatedTradingCompetitionsString = Preferences.Default.Get<string>("LastUpdatedTradingCompetitions", string.Empty);
+            var previousUpdatedTradingCompetitions = previousUpdatedTradingCompetitionsString.Split(",");
+
             var tradingCompetitionForDisplay = this.ViewModel.GetTradingCompetitions();
             int index = 1;
             foreach (var competition in tradingCompetitionForDisplay)
             {
                 var userPosition = this.ViewModel.GetUserPositionForTradingCompetition(competition);
+                var isNewCompetition = !previousUpdatedTradingCompetitions.Contains(competition.Name);
 
                 var nameLabel = new Label();
                 nameLabel.SetValue(Grid.RowProperty, index);
@@ -89,6 +93,19 @@ namespace LatokenMauiClient
                 targetLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
                 targetLabel.SetValue(Label.TextProperty, competition.TargetDisplay);
 
+                if (isNewCompetition)
+                {
+                    nameLabel.SetValue(Label.TextColorProperty, Colors.Green);
+                    userPositionLabel.SetValue(Label.TextColorProperty, Colors.Green);
+                    remainingTimeLabel.SetValue(Label.TextColorProperty, Colors.Green);
+                    targetLabel.SetValue(Label.TextColorProperty, Colors.Green);
+
+                    nameLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
+                    userPositionLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
+                    remainingTimeLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
+                    targetLabel.SetValue(Label.FontAttributesProperty, FontAttributes.Bold);
+                }
+
                 //var startDateLabel = new Label();
                 //startDateLabel.SetValue(Grid.RowProperty, index);
                 //startDateLabel.SetValue(Grid.ColumnProperty, 4);
@@ -113,6 +130,10 @@ namespace LatokenMauiClient
                 });
                 index++;
             }
+
+            var lastUpdatedTradingCompetitions = tradingCompetitionForDisplay.Select(c => c.Name).ToArray();
+
+            Preferences.Default.Set<string>("LastUpdatedTradingCompetitions", string.Join(',', lastUpdatedTradingCompetitions));
 
             Application.Current.Dispatcher.Dispatch(() =>
             {
