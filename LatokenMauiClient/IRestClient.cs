@@ -19,7 +19,11 @@ namespace LatokenMauiClient
 
         IEnumerable<PairDto> GetAvailablePairs();
 
-        IEnumerable<TradingCompetition> GetTradingCompetitions(int page = 0);
+        IEnumerable<TradingCompetition> GetActiveTradingCompetitions(int page = 0, int size = 10);
+
+        TradingCompetition GetTradingCompetition(string competitionId);
+
+        IEnumerable<TradingCompetition> GetAllTradingCompetitions(int page = 0, int size = 10);
 
         IEnumerable<TradingCompetitionLeaderBoardPosition> GetTradingCompetitionLeaderBoard(string competitionId, int page = 0, int size = 100);
 

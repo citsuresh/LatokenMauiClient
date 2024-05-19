@@ -10,6 +10,9 @@ namespace LatokenMauiClient
         private LatokenRestClient restClient;
         private ICurrencyCache currencyCache;
 
+        [ObservableProperty]
+        private bool isShowAllCompetitions;
+
         public TradingCompetitionsViewModel(ICurrencyCache currencyCache)
         {
             this.currencyCache = currencyCache;
@@ -42,11 +45,31 @@ namespace LatokenMauiClient
             {
                 try
                 {
-                    var competitions = this.restClient.GetTradingCompetitions().OrderBy(c => c.EndDate);
+                    List<TradingCompetition> competitions;
+                    if (this.IsShowAllCompetitions)
+                    {
+                        competitions = restClient.GetAllTradingCompetitions(0, 20).OrderByDescending(c => c.EndDate).ToList();
+                    }
+                    else
+                    {
+                        competitions = restClient.GetActiveTradingCompetitions().OrderBy(c => c.EndDate).ToList();
+                    }
+
+                    //var competitions = this.restClient.GetTradingCompetitions().OrderBy(c => c.EndDate);
                     foreach (var competition in competitions)
                     {
-                        var offset = DateTimeOffset.FromUnixTimeMilliseconds(competition.EndDate - DateTimeOffset.Now.ToUnixTimeMilliseconds());
-                        var remainingTime = $"{offset.DateTime.Day - 1} Days + {offset.DateTime.Hour}:{offset.DateTime.Minute}:{offset.DateTime.Second}";
+                        string? remainingTime = string.Empty;
+
+                        if (competition.Status.EndsWith("ACTIVE"))
+                        {
+                            var offset = DateTimeOffset.FromUnixTimeMilliseconds(competition.EndDate - DateTimeOffset.Now.ToUnixTimeMilliseconds());
+                            remainingTime = $"{offset.DateTime.Day - 1} Days + {offset.DateTime.Hour}:{offset.DateTime.Minute}:{offset.DateTime.Second}";
+                        }
+                        else if (competition.Status.EndsWith("FINISHED"))
+                        {
+                            var offset = DateTimeOffset.FromUnixTimeMilliseconds(DateTimeOffset.Now.ToUnixTimeMilliseconds() - competition.EndDate);
+                            remainingTime = $"- {offset.DateTime.Day - 1} Days + {offset.DateTime.Hour}:{offset.DateTime.Minute}:{offset.DateTime.Second}";
+                        }
 
                         competitionData.Add(new TradingCompetitionData
                         {

@@ -204,6 +204,12 @@ namespace LatokenMauiClient
             //TradingCompetitionGrid.Children.Add(startDateLabel);
             //TradingCompetitionGrid.Children.Add(endDateLabel);
         }
+
+        private void ShowAllSwitch_Toggled(object sender, ToggledEventArgs e)
+        {
+            this.ViewModel.IsShowAllCompetitions = e.Value;
+            this.OnRefresh();
+        }
     }
 
 }

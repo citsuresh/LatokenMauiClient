@@ -70,11 +70,29 @@ namespace LatokenMauiClient
             return pairs.Select(c => new PairDto { BaseCurrencyId = c.BaseCurrency, QuoteCurrencyId = c.QuoteCurrency, QuantityDecimals = c.QuantityDecimals, PriceTick = c.PriceTick });
         }
 
-        public IEnumerable<TradingCompetition> GetTradingCompetitions(int page = 0)
+
+        public IEnumerable<TradingCompetition> GetActiveTradingCompetitions(int page = 0, int size = 10)
         {
-            var tradingCompetitions = ClientInstance.GetActiveTradingCompetitions(page).Result.Content;
+            var tradingCompetitions = ClientInstance.GetActiveTradingCompetitions(page, size)?.Result?.Content;
+
+            if (tradingCompetitions == null)
+                return new TradingCompetition[0];
+
             return tradingCompetitions;
         }
+
+        public TradingCompetition GetTradingCompetition(string competitionId)
+        {
+            var tradingCompetition = ClientInstance.GetTradingCompetition(competitionId).Result;
+            return tradingCompetition;
+        }
+
+        public IEnumerable<TradingCompetition> GetAllTradingCompetitions(int page = 0, int size = 10)
+        {
+            var tradingCompetitions = ClientInstance.GetAllTradingCompetitions(page, size).Result;
+            return tradingCompetitions;
+        }
+
 
 
         public IEnumerable<TradingCompetitionLeaderBoardPosition> GetTradingCompetitionLeaderBoard(string competitionId, int page = 0, int size = 100)
