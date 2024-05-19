@@ -227,14 +227,15 @@ public partial class SellPage : ContentPage
     {
         this.ViewModel.SelectedPrice = priceLevelDto.Price;
         var accumulatedQuantity = this.ViewModel.GetAccumulatedQuantityForBidPrice(priceLevelDto);
-        if (accumulatedQuantity < this.ViewModel.BalanceDto.Available)
+        var totalAvailable = this.ViewModel.AvailableSpotBalance + this.ViewModel.AvailableWalletBalance;
+        if (accumulatedQuantity < totalAvailable)
         {
             this.ViewModel.SelectedQuantity = accumulatedQuantity;
             this.ViewModel.UpdatePercentBasedOnQuantity();
         }
         else
         {
-            this.ViewModel.SelectedQuantity = this.ViewModel.BalanceDto.Available;
+            this.ViewModel.SelectedQuantity = totalAvailable;
             this.ViewModel.UpdatePercentBasedOnQuantity();
         }
     }
@@ -306,5 +307,21 @@ public partial class SellPage : ContentPage
     private void RefreshView_Refreshing(object sender, EventArgs e)
     {
         this.OnRefresh();
+    }
+
+    private void AvailableWalletBalance_Tapped(object sender, TappedEventArgs e)
+    {
+        if(this.ViewModel.AvailableWalletBalance > 0)
+        {
+            this.ViewModel.SelectedQuantity = this.ViewModel.AvailableWalletBalance;
+        }
+    }
+
+    private void AvailableSpotBalance_Tapped(object sender, TappedEventArgs e)
+    {
+        if (this.ViewModel.AvailableSpotBalance > 0)
+        {
+            this.ViewModel.SelectedQuantity = this.ViewModel.AvailableSpotBalance;
+        }
     }
 }

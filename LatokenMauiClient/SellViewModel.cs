@@ -171,7 +171,7 @@ namespace LatokenMauiClient
         {
             if (BalanceDto != null)
             {
-                var newQty = BalanceDto.Available * ((decimal)(this.SellAmountPercent / 100));
+                var newQty = (this.AvailableSpotBalance + this.AvailableWalletBalance) * ((decimal)(this.SellAmountPercent / 100));
                 if (newQty != this.SelectedQuantity)
                 {
                     this.SelectedQuantity = newQty;

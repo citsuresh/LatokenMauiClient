@@ -111,8 +111,13 @@
                           Text="Wallet : "
                           Padding="4"/>
                             <Label 
-                          Text="{Binding AvailableWalletBalance, StringFormat='{0:G29}'}" 
-                          Padding="4"/>
+                                Text="{Binding AvailableWalletBalance, StringFormat='{0:G29}'}" 
+                                TextDecorations="Underline"
+                                Padding="4">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="AvailableWalletBalance_Tapped" />
+                                </Label.GestureRecognizers>
+                            </Label>
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Row="2"
                           Grid.Column="2">
@@ -120,8 +125,13 @@
                           Text="Spot : "
                           Padding="4"/>
                             <Label 
-                          Text="{Binding AvailableSpotBalance, StringFormat='{0:G29}'}" 
-                          Padding="4"/>
+                                Text="{Binding AvailableSpotBalance, StringFormat='{0:G29}'}"
+                                TextDecorations="Underline" 
+                                Padding="4">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="AvailableSpotBalance_Tapped" />
+                                </Label.GestureRecognizers>
+                            </Label>
                         </HorizontalStackLayout>
                         <Button Text="Sell" 
                             IsEnabled="{Binding IsSellEnabled}"
