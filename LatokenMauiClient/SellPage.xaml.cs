@@ -3,14 +3,16 @@ namespace LatokenMauiClient;
 
 public partial class SellPage : ContentPage
 {
+    private IServiceProvider serviceProvider;
     public SellViewModel ViewModel { get; set; }
 
     private Label[] priceLables = new Label[14];
     private Label[] quantityLabels = new Label[14];
     private Label[] accumulatedLabels = new Label[14];
 
-    public SellPage(SellViewModel viewModel)
+    public SellPage(SellViewModel viewModel, IServiceProvider serviceProvider)
     {
+        this.serviceProvider = serviceProvider;
         this.ViewModel = viewModel;
         this.ViewModel.RefreshCallback = () => this.OnRefresh();
 
@@ -323,5 +325,12 @@ public partial class SellPage : ContentPage
         {
             this.ViewModel.SelectedQuantity = this.ViewModel.AvailableSpotBalance;
         }
+    }
+
+    private void TransferBalance_Tapped(object sender, TappedEventArgs e)
+    {
+        var transferPage = new TransferPage(new TransferViewModel(serviceProvider));
+        transferPage.Initialize(this.ViewModel.UserProfile, this.ViewModel.RestClient, this.ViewModel.CurrencyCache, this.ViewModel.BalanceDto);
+        Navigation.PushAsync(transferPage);
     }
 }

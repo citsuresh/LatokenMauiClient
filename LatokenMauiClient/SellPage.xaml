@@ -100,11 +100,19 @@
                             <Button Text="75%" BackgroundColor="HotPink" Grid.Column="2" Padding="0" Margin="0" FontSize="10" Clicked="Price75PercentButton_Clicked"/>
                             <Button Text="100%" BackgroundColor="HotPink" Grid.Column="3" Padding="0" Margin="0" FontSize="10" Clicked="Price100PercentButton_Clicked"/>
                         </Grid>
-                        <Label Grid.Row="0"
-                          Grid.Column="2"
-                      Text="Balances"
-                      Padding="4"
-                      FontAttributes="Bold" />
+                        <HorizontalStackLayout
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            Padding="4">
+                            <Label 
+                                    Text="Balances"
+                                    FontAttributes="Bold" />
+                            <Label Text="&lt;-&gt;" Margin="5,0,0,0" TextDecorations="Underline">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="TransferBalance_Tapped" CommandParameter="{Binding BalanceDto}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </HorizontalStackLayout>                        
                         <HorizontalStackLayout Grid.Row="1"
                           Grid.Column="2">
                             <Label 
@@ -115,7 +123,7 @@
                           Padding="4"/>
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Grid.Row="2"
-                          Grid.Column="2">
+                          Grid.Column="2" >
                             <Label 
                           Text="Spot : "
                           Padding="4"/>

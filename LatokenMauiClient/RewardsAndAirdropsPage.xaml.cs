@@ -217,7 +217,7 @@ namespace LatokenMauiClient
                 }
 
 
-                var sellPage = new SellPage(new SellViewModel(serviceProvider));
+                var sellPage = new SellPage(new SellViewModel(serviceProvider), serviceProvider);
                 sellPage.Initialize(userProfile, this.ViewModel.RestClient, this.ViewModel.CurrencyCache, availablePairs.First(), balanceDto);
                 Navigation.PushAsync(sellPage);
             }
