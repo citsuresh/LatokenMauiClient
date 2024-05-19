@@ -13,7 +13,7 @@
             Spacing="25">
                 <HorizontalStackLayout HorizontalOptions="Center">
                     <Label Text="Show All" VerticalTextAlignment="Center"></Label>
-                    <Switch Margin="0,0,0,0" IsToggled="{Binding IsShowAllCompetitions}"  Toggled="ShowAllSwitch_Toggled"/>
+                    <Switch Margin="5,0,0,0" IsToggled="{Binding IsShowAllCompetitions}"  Toggled="ShowAllSwitch_Toggled"/>
                     <Label Text=" (Upto 20 Competitions)" FontAttributes="Italic" VerticalTextAlignment="Center"></Label>
                 </HorizontalStackLayout>
                 <Button x:Name="RefreshButton" Text="Refresh" Clicked="RefreshButton_Clicked" />
