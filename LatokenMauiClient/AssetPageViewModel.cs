@@ -5,8 +5,14 @@ namespace LatokenMauiClient
 {
     public partial class AssetPageViewModel : ObservableObject
     {
+
+        [ObservableProperty] 
         private Profile userProfile;
+
+        [ObservableProperty] 
         private LatokenRestClient restClient;
+
+        [ObservableProperty] 
         private ICurrencyCache currencyCache;
 
         public AssetPageViewModel(ICurrencyCache currencyCache)

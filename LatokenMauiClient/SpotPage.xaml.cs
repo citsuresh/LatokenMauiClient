@@ -5,12 +5,14 @@ namespace LatokenMauiClient
     public partial class SpotPage : ContentPage
     {
         private bool isFirstVisit = true;
+        private IServiceProvider serviceProvider;
 
         public AssetPageViewModel ViewModel { get; set; }
         private List<Task> Tasks { get; set; } = new List<Task>();
 
-        public SpotPage(AssetPageViewModel viewModel)
+        public SpotPage(AssetPageViewModel viewModel, IServiceProvider serviceProvider)
         {
+            this.serviceProvider = serviceProvider;
             WeakReferenceMessenger.Default.Register<SelectedProfileChangedMessage>(this, this.OnSelectedProfileChangedMessage);
             InitializeComponent();
             this.ViewModel = viewModel;
@@ -67,11 +69,25 @@ namespace LatokenMauiClient
                 int index = 1;
                 foreach (var asset in spotAssets)
                 {
+                    HorizontalStackLayout nameStackLayout = new HorizontalStackLayout();
+                    nameStackLayout.SetValue(Grid.RowProperty, index);
+                    nameStackLayout.SetValue(Grid.ColumnProperty, 0);
+                    nameStackLayout.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+
                     var nameLabel = new Label();
-                    nameLabel.SetValue(Grid.RowProperty, index);
-                    nameLabel.SetValue(Grid.ColumnProperty, 0);
                     nameLabel.SetValue(Label.TextProperty, asset.CurrencySymbol);
-                    nameLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+
+                    var txLabel = new Label();
+                    txLabel.SetValue(Label.MarginProperty, new Thickness(5, 0, 0, 0));
+                    txLabel.SetValue(Label.TextProperty, "<->");
+                    txLabel.SetValue(Label.TextDecorationsProperty, TextDecorations.Underline);
+                    var tapGestureRecognizer = new TapGestureRecognizer();
+                    tapGestureRecognizer.Tapped += TxLabel_Tapped;
+                    tapGestureRecognizer.CommandParameter = asset;
+                    txLabel.GestureRecognizers.Add(tapGestureRecognizer);
+
+                    nameStackLayout.Children.Add(nameLabel);
+                    nameStackLayout.Children.Add(txLabel);
 
                     var quantityLabel = new Label();
                     quantityLabel.SetValue(Grid.RowProperty, index);
@@ -90,7 +106,7 @@ namespace LatokenMauiClient
                     Application.Current.Dispatcher.Dispatch(() =>
                     {
                         AssetsGrid.RowDefinitions.Add(new RowDefinition());
-                        AssetsGrid.Children.Add(nameLabel);
+                        AssetsGrid.Children.Add(nameStackLayout);
                         AssetsGrid.Children.Add(quantityLabel);
                         AssetsGrid.Children.Add(valueLabel);
                     });
@@ -113,6 +129,17 @@ namespace LatokenMauiClient
             }
         }
 
+        private void TxLabel_Tapped(object? sender, TappedEventArgs e)
+        {
+            var asset = e.Parameter as BalanceDto;
+            if (asset != null)
+            {
+                var transferPage = new TransferPage(new TransferViewModel(serviceProvider));
+                transferPage.Initialize(this.ViewModel.UserProfile, this.ViewModel.RestClient, this.ViewModel.CurrencyCache, asset);
+                Navigation.PushAsync(transferPage);
+            }
+        }
+
         private void SortAndRepopulateAssets(IEnumerable<BalanceDto> assets)
         {
             assets = assets.OrderByDescending(a => a.AvailableValue);
@@ -128,11 +155,25 @@ namespace LatokenMauiClient
             int index = 1;
             foreach (var asset in assets)
             {
+                HorizontalStackLayout nameStackLayout = new HorizontalStackLayout();
+                nameStackLayout.SetValue(Grid.RowProperty, index);
+                nameStackLayout.SetValue(Grid.ColumnProperty, 0);
+                nameStackLayout.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+
                 var nameLabel = new Label();
-                nameLabel.SetValue(Grid.RowProperty, index);
-                nameLabel.SetValue(Grid.ColumnProperty, 0);
                 nameLabel.SetValue(Label.TextProperty, asset.CurrencySymbol);
-                nameLabel.SetValue(Grid.MarginProperty, new Thickness(5, 0, 0, 5));
+
+                var txLabel = new Label();
+                txLabel.SetValue(Label.MarginProperty, new Thickness(5, 0, 0, 0));
+                txLabel.SetValue(Label.TextProperty, "<->");
+                txLabel.SetValue(Label.TextDecorationsProperty, TextDecorations.Underline);
+                var tapGestureRecognizer = new TapGestureRecognizer();
+                tapGestureRecognizer.Tapped += TxLabel_Tapped;
+                tapGestureRecognizer.CommandParameter = asset;
+                txLabel.GestureRecognizers.Add(tapGestureRecognizer);
+
+                nameStackLayout.Children.Add(nameLabel);
+                nameStackLayout.Children.Add(txLabel);
 
                 var quantityLabel = new Label();
                 quantityLabel.SetValue(Grid.RowProperty, index);
@@ -151,7 +192,7 @@ namespace LatokenMauiClient
                 Application.Current.Dispatcher.Dispatch(() =>
                 {
                     AssetsGrid.RowDefinitions.Add(new RowDefinition());
-                    AssetsGrid.Children.Add(nameLabel);
+                    AssetsGrid.Children.Add(nameStackLayout);
                     AssetsGrid.Children.Add(quantityLabel);
                     AssetsGrid.Children.Add(valueLabel);
                 });

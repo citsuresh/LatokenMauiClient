@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LatokenMauiClient.TransferPage"
+             Loaded="ContentPage_Loaded"
+             Title="Sell">
+    <RefreshView IsRefreshing="{Binding IsRefreshing}" Refreshing="RefreshView_Refreshing">
+        <ScrollView>
+            <VerticalStackLayout>
+                <HorizontalStackLayout VerticalOptions="Start" HorizontalOptions="Center">
+                    <Label Text="Transfer" Margin="0,0,10,0"/>
+                    <Label Text="{Binding BalanceDto.CurrencySymbol}"/>
+                </HorizontalStackLayout>
+
+                <Button x:Name="RefreshButton" Margin="5" Text="Refresh" Clicked="RefreshButton_Clicked" />
+                <!--<ActivityIndicator x:Name="BusyIndicator"  IsRunning="True" />-->
+
+                <Border StrokeThickness="2" Stroke="DarkGray" Background="Beige" Padding="10" Margin="10" >
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <HorizontalStackLayout 
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Padding="4">
+                            <Label 
+                                  Text="{Binding BalanceDto.CurrencySymbol}"
+                                  FontAttributes="Bold" />
+                            <Label 
+                                  Margin="5,0,0,0"
+                                  Text="Balances"
+                                  FontAttributes="Bold" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Grid.Row="1"
+                          Grid.Column="0">
+                            <Label 
+                          Text="Wallet : "
+                          Padding="4"/>
+                            <Label 
+                                Text="{Binding AvailableWalletBalance, StringFormat='{0:G29}'}" 
+                                TextDecorations="Underline"
+                                Padding="4">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="AvailableWalletBalance_Tapped" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Grid.Row="2"
+                          Grid.Column="0">
+                            <Label 
+                          Text="Spot : "
+                          Padding="4"/>
+                            <Label 
+                                Text="{Binding AvailableSpotBalance, StringFormat='{0:G29}'}"
+                                TextDecorations="Underline" 
+                                Padding="4">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="AvailableSpotBalance_Tapped" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Border>
+                <Border StrokeThickness="2" Stroke="DarkGray" Background="LightGray" Padding="10" Margin="10" >
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Row="0"
+                          Grid.Column="0"                          
+                          Grid.ColumnSpan="3"
+                          Text="Transfer From Wallet To Spot"
+                          Padding="4"
+                          FontAttributes="Bold" />
+                        <Editor Grid.Row="1"
+                          Grid.Column="0"
+                          Text="{Binding SelectedWalletToSpotQuantity, StringFormat='{0:G29}'}"
+                          />
+                        <Slider Value="{Binding WalletToSpotTransferAmountPercent}" ValueChanged="WalletToSpotAmountSlider_ValueChanged"  Grid.Row="2" Grid.Column="0" Minimum="0" Maximum="100"/>
+                        <Grid Margin="10"
+                            Grid.Row="3"
+                            Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Text="25%" BackgroundColor="HotPink" Grid.Column="0" Padding="0" Margin="0" FontSize="10" Clicked="WalletToSpot25PercentButton_Clicked"/>
+                            <Button Text="50%" BackgroundColor="HotPink" Grid.Column="1" Padding="0" Margin="0" FontSize="10" Clicked="WalletToSpot50PercentButton_Clicked"/>
+                            <Button Text="75%" BackgroundColor="HotPink" Grid.Column="2" Padding="0" Margin="0" FontSize="10" Clicked="WalletToSpot75PercentButton_Clicked"/>
+                            <Button Text="100%" BackgroundColor="HotPink" Grid.Column="3" Padding="0" Margin="0" FontSize="10" Clicked="WalletToSpot100PercentButton_Clicked"/>
+                        </Grid>
+                        <Button Text="Transfer" 
+                          Clicked="TransferFromWalletToSpotButton_Clicked"
+                          Margin="10"
+                          Grid.Row="1" 
+                          Grid.Column="2"/>
+                    </Grid>
+                </Border>
+                <Border StrokeThickness="2" Stroke="DarkGray" Background="LightGray" Padding="10" Margin="10" >
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Row="0"
+                          Grid.Column="0"
+                          Grid.ColumnSpan="3"
+                          Text="Transfer From Spot To Wallet"
+                          Padding="4"
+                          FontAttributes="Bold" />
+                        <Editor Grid.Row="1"
+                          Grid.Column="0"
+                          Text="{Binding SelectedSpotToWalletQuantity, StringFormat='{0:G29}'}"
+                          />
+                        <Slider Value="{Binding SpotToWalletTransferAmountPercent}" ValueChanged="SpotToWalletAmountSlider_ValueChanged"  Grid.Row="2" Grid.Column="0" Minimum="0" Maximum="100"/>
+                        <Grid Margin="10"
+                            Grid.Row="3"
+                            Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Text="25%" BackgroundColor="HotPink" Grid.Column="0" Padding="0" Margin="0" FontSize="10" Clicked="SpotToWallet25PercentButton_Clicked"/>
+                            <Button Text="50%" BackgroundColor="HotPink" Grid.Column="1" Padding="0" Margin="0" FontSize="10" Clicked="SpotToWallet50PercentButton_Clicked"/>
+                            <Button Text="75%" BackgroundColor="HotPink" Grid.Column="2" Padding="0" Margin="0" FontSize="10" Clicked="SpotToWallet75PercentButton_Clicked"/>
+                            <Button Text="100%" BackgroundColor="HotPink" Grid.Column="3" Padding="0" Margin="0" FontSize="10" Clicked="SpotToWallet100PercentButton_Clicked"/>
+                        </Grid>
+                        <Button Text="Transfer" 
+                          Clicked="TransferFromSpotToWalletButton_Clicked"
+                          Margin="10"
+                          Grid.Row="1" 
+                          Grid.Column="2"/>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

@@ -43,6 +43,8 @@ namespace LatokenMauiClient
             builder.Services.AddTransient<RewardsAndAirdropsViewModel>();
             builder.Services.AddTransient<SellPage>();
             builder.Services.AddTransient<SellViewModel>();
+            builder.Services.AddTransient<TransferPage>();
+            builder.Services.AddTransient<TransferViewModel>();
             builder.Services.AddTransient<ICurrencyCache, LatokenCurrencyCache>();
 
             builder.Services.AddSingleton<IAlertService, AlertService>();
