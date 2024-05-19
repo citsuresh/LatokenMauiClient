@@ -31,12 +31,12 @@
                ContentTemplate="{DataTemplate local:RewardsAndAirdropsPage}" />
         </Tab>
         <Tab Title="Assets" Icon="assets.svg">
-            <ShellContent Title="Wallet Balances" 
-              Route="wallet" 
-              ContentTemplate="{DataTemplate local:WalletPage}"  />
             <ShellContent Title="Spot Balances" 
               Route="spot" 
               ContentTemplate="{DataTemplate local:SpotPage}" />
+            <ShellContent Title="Wallet Balances" 
+              Route="wallet" 
+              ContentTemplate="{DataTemplate local:WalletPage}"  />
         </Tab>
        
     </TabBar>
