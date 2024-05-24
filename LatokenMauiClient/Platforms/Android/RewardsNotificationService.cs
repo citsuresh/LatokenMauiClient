@@ -54,6 +54,50 @@ namespace LatokenMauiClient.Platforms.Android
             return StartCommandResult.Sticky;
         }
 
+        private static bool CheckNewBitMartVoteListing()
+        {
+            var client = new HttpClient();
+            try
+            {
+                HttpResponseMessage response = client.GetAsync("https://www.bitmart.com/voting/en-US").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = response.Content.ReadAsStringAsync().Result;
+                    if (content.Contains("Upcoming"))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return false;
+        }
+
+        private static bool CheckNewBitMartLaunchpad()
+        {
+            var client = new HttpClient();
+            try
+            {
+                HttpResponseMessage response = client.GetAsync("https://www.bitmart.com/launchpad/en-US").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = response.Content.ReadAsStringAsync().Result;
+                    if (content.Contains("Upcoming"))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return false;
+        }
+
         public override void OnDestroy()
         {
             base.OnDestroy();
@@ -119,7 +163,7 @@ namespace LatokenMauiClient.Platforms.Android
 
 
             var refreshAction = new NotificationCompat.Action.Builder(Resource.Drawable.refresh_image, "Refresh", refreshActionPendingIntent).Build();
-            
+
             var notification = new NotificationCompat.Builder(this, channelId)
                 .SetContentTitle("Listening for new Rewards and Competitions")
                 .SetContentText(text)
@@ -218,10 +262,23 @@ namespace LatokenMauiClient.Platforms.Android
                         }
                     }
 
-                    if (string.IsNullOrEmpty(rewardsNotificationMessage) && string.IsNullOrEmpty(competitionsNotificationMessage))
+                    var bitMartMessage = string.Empty;
+                    if (CheckNewBitMartVoteListing())
+                    {
+                        bitMartMessage = "New BitMart Vote.\n";
+                    }
+
+                    if(CheckNewBitMartLaunchpad())
+                    {
+                        bitMartMessage += "New BitMart Launchpad.\n";
+                    }
+
+                    if (string.IsNullOrEmpty(rewardsNotificationMessage) 
+                        && string.IsNullOrEmpty(competitionsNotificationMessage)
+                        && string.IsNullOrEmpty(bitMartMessage))
                     {
                         string message = $"Checked rewards and competitions {counter} times\nNo new Rewards and Competitions since you last checked!";
-                        var notification = CreateUpdatedNotification(NormalNotificationChannelId, "Running in the background. No New Rewards and Competitions!", message);
+                        var notification = CreateUpdatedNotification(NormalNotificationChannelId, $"Running in the background. {bitMartMessage} No New Rewards and Competitions!", message);
                         StartForeground(ServiceNotificationId, notification);
                     }
                     else
@@ -229,16 +286,26 @@ namespace LatokenMauiClient.Platforms.Android
                         if (!string.IsNullOrEmpty(rewardsNotificationMessage))
                         {
                             // Display a notification
-                            string message = $"Checked rewards and competitions {counter} times\n{rewardsNotificationMessage}";
-                            var notification = CreateUpdatedNotification(NewRewardsNotificationChannelId, $"Running in the background. {totalNewRewards} New Rewards!\"", message);
+                            string message = $"Checked rewards and competitions {counter} times\n{bitMartMessage}{rewardsNotificationMessage}";
+                            var notification = CreateUpdatedNotification(NewRewardsNotificationChannelId, $"Running in the background. {bitMartMessage} {totalNewRewards} New Rewards!\"", message);
                             StartForeground(ServiceNotificationId, notification);
                         }
 
                         if (!string.IsNullOrEmpty(competitionsNotificationMessage))
                         {
                             // Display a notification
-                            string message = $"Checked rewards and competitions {counter} times\n{competitionsNotificationMessage}";
-                            var notification = CreateUpdatedNotification(NewTradingCompetitionsNotificationChannelId, $"Running in the background. {totalNewCompetitions} New Competitions!\"", message);
+                            string message = $"Checked rewards and competitions {counter} times\n{bitMartMessage}{competitionsNotificationMessage}";
+                            var notification = CreateUpdatedNotification(NewTradingCompetitionsNotificationChannelId, $"Running in the background. {bitMartMessage}{totalNewCompetitions} New Competitions!\"", message);
+                            StartForeground(ServiceNotificationId, notification);
+                        }
+
+                        if (string.IsNullOrEmpty(rewardsNotificationMessage)
+                            && string.IsNullOrEmpty(competitionsNotificationMessage)
+                            && !string.IsNullOrEmpty(bitMartMessage))
+                        {   
+                            // Display a notification
+                            string message = $"Checked rewards and competitions {counter} times\n{bitMartMessage}";
+                            var notification = CreateUpdatedNotification(NewTradingCompetitionsNotificationChannelId, $"Running in the background. {bitMartMessage}!\"", message);
                             StartForeground(ServiceNotificationId, notification);
                         }
                     }
