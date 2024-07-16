@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.OS;
 using AndroidX.Core.App;
+using System;
 using Uri = Android.Net.Uri;
 
 namespace LatokenMauiClient.Platforms.Android
@@ -13,6 +14,7 @@ namespace LatokenMauiClient.Platforms.Android
         private const string NormalNotificationChannelId = "NormalNotificationChannel";
         private const string NewRewardsNotificationChannelId = "NewRewardsNotificationChannel";
         private const string NewTradingCompetitionsNotificationChannelId = "NewTradingCompetitionsNotificationChannel";
+        private const string EndingTradingCompetitionsNotificationChannelId = "EndingTradingCompetitionsNotificationChannelId";
         private const string ErrorNotificationChannelId = "ErrorNotificationChannel";
         private const string EXTRA_REFRESH = "refresh";
         private CancellationTokenSource cancellationTokenSource;
@@ -121,9 +123,13 @@ namespace LatokenMauiClient.Platforms.Android
                 var notificationManager3 = (NotificationManager)GetSystemService(NotificationService);
                 notificationManager3.CreateNotificationChannel(channel3);
 
-                var channel4 = new NotificationChannel(ErrorNotificationChannelId, "Error", NotificationImportance.Max);
+                var channel4 = new NotificationChannel(EndingTradingCompetitionsNotificationChannelId, "Ending Trading Competitions", NotificationImportance.Max);
                 var notificationManager4 = (NotificationManager)GetSystemService(NotificationService);
                 notificationManager4.CreateNotificationChannel(channel4);
+
+                var channel5 = new NotificationChannel(ErrorNotificationChannelId, "Error", NotificationImportance.Max);
+                var notificationManager5 = (NotificationManager)GetSystemService(NotificationService);
+                notificationManager5.CreateNotificationChannel(channel5);
             }
         }
 
@@ -195,11 +201,21 @@ namespace LatokenMauiClient.Platforms.Android
                     var totalNewCompetitions = 0;
                     var newTradingCompetitions = tradingCompetitions.Where(c => !previousUpdatedTradingCompetitions.Contains(c.Name));
 
-                    var competitionsNotificationMessage = string.Empty;
+                    var newCompetitionsNotificationMessage = string.Empty;
                     if (newTradingCompetitions.Any())
                     {
                         totalNewCompetitions = newTradingCompetitions.Count();
-                        competitionsNotificationMessage = "New Trading Competitions : " + string.Join(", ", newTradingCompetitions.Select(c => c.Name));
+                        newCompetitionsNotificationMessage = "New Trading Competitions : " + string.Join(", ", newTradingCompetitions.Select(c => c.Name));
+                    }
+
+                    var totalEndingCompetitions = 0;
+                    var endingTradingCompetitions = tradingCompetitions.Where(comp => comp.EndDate >= DateTime.Now.AddHours(-2));
+
+                    var endingCompetitionsNotificationMessage = string.Empty;
+                    if (endingTradingCompetitions.Any())
+                    {
+                        totalEndingCompetitions = endingTradingCompetitions.Count();
+                        endingCompetitionsNotificationMessage = "Ending Trading Competitions : \n" + string.Join(",\n", endingTradingCompetitions.Select(c => c.Name + " - " + c.EndDate.ToLocalTime().ToShortDateString() + " " + c.EndDate.ToLocalTime().ToLongTimeString()));
                     }
 
                     var profiles = this.GetProfiles();
@@ -263,18 +279,19 @@ namespace LatokenMauiClient.Platforms.Android
                     }
 
                     var bitMartMessage = string.Empty;
-                    if (CheckNewBitMartVoteListing())
-                    {
-                        bitMartMessage = "New BitMart Vote.\n";
-                    }
+                    //if (CheckNewBitMartVoteListing())
+                    //{
+                    //    bitMartMessage = "New BitMart Vote.\n";
+                    //}
 
-                    if(CheckNewBitMartLaunchpad())
-                    {
-                        bitMartMessage += "New BitMart Launchpad.\n";
-                    }
+                    //if(CheckNewBitMartLaunchpad())
+                    //{
+                    //    bitMartMessage += "New BitMart Launchpad.\n";
+                    //}
 
                     if (string.IsNullOrEmpty(rewardsNotificationMessage) 
-                        && string.IsNullOrEmpty(competitionsNotificationMessage)
+                        && string.IsNullOrEmpty(newCompetitionsNotificationMessage)
+                        && string.IsNullOrEmpty(endingCompetitionsNotificationMessage)
                         && string.IsNullOrEmpty(bitMartMessage))
                     {
                         string message = $"Checked rewards and competitions {counter} times\nNo new Rewards and Competitions since you last checked!";
@@ -291,18 +308,27 @@ namespace LatokenMauiClient.Platforms.Android
                             StartForeground(ServiceNotificationId, notification);
                         }
 
-                        if (!string.IsNullOrEmpty(competitionsNotificationMessage))
+                        if (!string.IsNullOrEmpty(newCompetitionsNotificationMessage))
                         {
                             // Display a notification
-                            string message = $"Checked rewards and competitions {counter} times\n{bitMartMessage}{competitionsNotificationMessage}";
+                            string message = $"Checked rewards and competitions {counter} times\n{bitMartMessage}{newCompetitionsNotificationMessage}";
                             var notification = CreateUpdatedNotification(NewTradingCompetitionsNotificationChannelId, $"Running in the background. {bitMartMessage}{totalNewCompetitions} New Competitions!\"", message);
                             StartForeground(ServiceNotificationId, notification);
                         }
 
+                        if (!string.IsNullOrEmpty(endingCompetitionsNotificationMessage))
+                        {
+                            // Display a notification
+                            string message = $"Checked rewards and competitions {counter} times\n{bitMartMessage}{endingCompetitionsNotificationMessage}";
+                            var notification = CreateUpdatedNotification(EndingTradingCompetitionsNotificationChannelId, $"Running in the background. {bitMartMessage}{totalEndingCompetitions} Ending Competitions!\"", message);
+                            StartForeground(ServiceNotificationId, notification);
+                        }
+
                         if (string.IsNullOrEmpty(rewardsNotificationMessage)
-                            && string.IsNullOrEmpty(competitionsNotificationMessage)
+                            && string.IsNullOrEmpty(newCompetitionsNotificationMessage)
+                            && string.IsNullOrEmpty(endingCompetitionsNotificationMessage)
                             && !string.IsNullOrEmpty(bitMartMessage))
-                        {   
+                        {
                             // Display a notification
                             string message = $"Checked rewards and competitions {counter} times\n{bitMartMessage}";
                             var notification = CreateUpdatedNotification(NewTradingCompetitionsNotificationChannelId, $"Running in the background. {bitMartMessage}!\"", message);
