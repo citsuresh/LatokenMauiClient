@@ -209,7 +209,8 @@ namespace LatokenMauiClient.Platforms.Android
                     }
 
                     var totalEndingCompetitions = 0;
-                    var endingTradingCompetitions = tradingCompetitions.Where(comp => comp.EndDate >= DateTime.Now.AddHours(-2));
+                    //Select the trading competitions which will within 2 hours
+                    var endingTradingCompetitions = tradingCompetitions.Where(comp => comp.EndDate.ToLocalTime().AddHours(-2) <= DateTime.Now);
 
                     var endingCompetitionsNotificationMessage = string.Empty;
                     if (endingTradingCompetitions.Any())
@@ -289,7 +290,7 @@ namespace LatokenMauiClient.Platforms.Android
                     //    bitMartMessage += "New BitMart Launchpad.\n";
                     //}
 
-                    if (string.IsNullOrEmpty(rewardsNotificationMessage) 
+                    if (string.IsNullOrEmpty(rewardsNotificationMessage)
                         && string.IsNullOrEmpty(newCompetitionsNotificationMessage)
                         && string.IsNullOrEmpty(endingCompetitionsNotificationMessage)
                         && string.IsNullOrEmpty(bitMartMessage))
