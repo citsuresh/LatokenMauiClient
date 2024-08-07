@@ -66,7 +66,7 @@ public partial class SellPage : ContentPage
             }
 
             int index = 1;
-            foreach (var ask in orderbook.Ask)
+            foreach (var ask in orderbook.Ask.OrderByDescending(ask => ask.Price))
             {
                 AddOrUpdateRow(ask, index++, true);
             }
