@@ -88,9 +88,9 @@
             {
                 if (restClient == null)
                 {
-                    var profileName = Preferences.Default.Get<string>("ProfileName", string.Empty);
-                    var apiKey = Preferences.Default.Get<string>("ApiKey", string.Empty);
-                    var apiSecret = Preferences.Default.Get<string>("ApiSecret", string.Empty);
+                    var profileName = Preferences.Default.Get<string>("Profile 1_ProfileName", string.Empty);
+                    var apiKey = Preferences.Default.Get<string>("Profile 1_ApiKey", string.Empty);
+                    var apiSecret = Preferences.Default.Get<string>("Profile 1_ApiSecret", string.Empty);
                     if (!string.IsNullOrEmpty(profileName) &&
                         !string.IsNullOrEmpty(apiKey) &&
                         !string.IsNullOrEmpty(apiSecret))
