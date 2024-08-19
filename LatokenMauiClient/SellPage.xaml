@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:LatokenMauiClient"
              x:Class="LatokenMauiClient.SellPage"
              Loaded="ContentPage_Loaded"
              Title="Sell">
+    <Shell.TitleView>
+        <local:ProfileTitle></local:ProfileTitle>
+    </Shell.TitleView>
     <RefreshView IsRefreshing="{Binding IsRefreshing}" Refreshing="RefreshView_Refreshing">
         <ScrollView>
             <VerticalStackLayout>

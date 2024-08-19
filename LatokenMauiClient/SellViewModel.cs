@@ -121,6 +121,17 @@ namespace LatokenMauiClient
             this.RefreshCallback();
         }
 
+        internal void InitializeProfileAndRestClient()
+        {
+            var profileFilterInstance = App.Current.Resources["ProfileFilterInstance"] as ProfileFilter;
+            if (profileFilterInstance != null && profileFilterInstance.SelectedProfile != null)
+            {
+                var profile = profileFilterInstance.SelectedProfile;
+                this.UserProfile = profile;
+                this.RestClient = new LatokenRestClient(profile.ApiKey, profile.ApiSecret);
+            }
+        }
+
         public void InitializeProfileAndRestClient(Profile userProfile, LatokenRestClient restClient, ICurrencyCache currencyCache, PairDto selectedTradingPair, BalanceDto balanceDto)
         {
             this.UserProfile = userProfile;

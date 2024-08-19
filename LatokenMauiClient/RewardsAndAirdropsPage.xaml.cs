@@ -216,6 +216,12 @@ namespace LatokenMauiClient
                     balanceDto.CurrencySymbol = this.ViewModel.CurrencyCache.AvailableCurrencies.FirstOrDefault(c => c?.Id == balanceDto.CurrencyId)?.Symbol;
                 }
 
+                //Set the selected profile for the sell window
+                var profileFilterInstance = App.Current.Resources["ProfileFilterInstance"] as ProfileFilter;
+                if (profileFilterInstance != null && profileFilterInstance.SelectedProfile != null)
+                {
+                    profileFilterInstance.SelectedProfile = userProfile;
+                }
 
                 var sellPage = new SellPage(new SellViewModel(serviceProvider), serviceProvider);
                 sellPage.Initialize(userProfile, this.ViewModel.RestClient, this.ViewModel.CurrencyCache, availablePairs.First(), balanceDto);

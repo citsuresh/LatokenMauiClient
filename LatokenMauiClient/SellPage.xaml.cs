@@ -1,4 +1,6 @@
 
+using CommunityToolkit.Mvvm.Messaging;
+
 namespace LatokenMauiClient;
 
 public partial class SellPage : ContentPage
@@ -13,11 +15,21 @@ public partial class SellPage : ContentPage
     public SellPage(SellViewModel viewModel, IServiceProvider serviceProvider)
     {
         this.serviceProvider = serviceProvider;
+        WeakReferenceMessenger.Default.Register<SelectedProfileChangedMessage>(this, this.OnSelectedProfileChangedMessage);
         this.ViewModel = viewModel;
         this.ViewModel.RefreshCallback = () => this.OnRefresh();
 
         this.BindingContext = ViewModel;
         InitializeComponent();
+    }
+
+    private void OnSelectedProfileChangedMessage(object recipient, SelectedProfileChangedMessage message)
+    {
+        if (Shell.Current.CurrentPage == this && ViewModel != null && RefreshButton != null)
+        {
+            this.ViewModel.InitializeProfileAndRestClient();
+            this.OnRefresh();
+        }
     }
 
     internal void Initialize(Profile userProfile, LatokenRestClient restClient, ICurrencyCache currencyCache, PairDto selectedTradingPair, BalanceDto balanceDto)
@@ -58,7 +70,7 @@ public partial class SellPage : ContentPage
         var orderbook = this.ViewModel.FetchOrderBook();
         if (orderbook != null)
         {
-            for (int i = 0;i<14;i++)
+            for (int i = 0; i < 14; i++)
             {
                 priceLables[i] = null;
                 quantityLabels[i] = null;
@@ -100,8 +112,8 @@ public partial class SellPage : ContentPage
             }
             else
             {
-                if(this.ViewModel.Orderbook != null 
-                    && this.ViewModel.Orderbook.Bid.Any() 
+                if (this.ViewModel.Orderbook != null
+                    && this.ViewModel.Orderbook.Bid.Any()
                     && this.ViewModel.Orderbook.Bid.First().Price != this.ViewModel.SelectedPrice
                     && this.ViewModel.Orderbook.Bid.First().Quantity != this.ViewModel.SelectedQuantity)
                 {
@@ -313,7 +325,7 @@ public partial class SellPage : ContentPage
 
     private void AvailableWalletBalance_Tapped(object sender, TappedEventArgs e)
     {
-        if(this.ViewModel.AvailableWalletBalance > 0)
+        if (this.ViewModel.AvailableWalletBalance > 0)
         {
             this.ViewModel.SelectedQuantity = this.ViewModel.AvailableWalletBalance;
         }
