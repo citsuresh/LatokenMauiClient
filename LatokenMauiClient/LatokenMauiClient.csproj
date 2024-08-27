@@ -65,6 +65,7 @@
 	  <None Remove="appsettings.json" />
 	  <None Remove="Platforms\Android\drawable\latoken.png" />
 	  <None Remove="Platforms\Android\drawable\refresh_image.png" />
+	  <None Remove="Resources\Images\airdrop.svg" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -100,8 +101,11 @@
 	  <Compile Update="ProfilePage.xaml.cs">
 	    <DependentUpon>ProfilePage.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="RewardsAndAirdropsPage.xaml.cs">
-	    <DependentUpon>RewardsAndAirdropsPage.xaml</DependentUpon>
+	  <Compile Update="AirdropsPage.xaml.cs">
+	    <DependentUpon>AirdropsPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="RewardsAndCompetitionsPage.xaml.cs">
+	    <DependentUpon>RewardsAndCompetitionsPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="TransferPage.xaml.cs">
 	    <DependentUpon>TransferPage.xaml</DependentUpon>
@@ -124,7 +128,10 @@
 	  <MauiXaml Update="ProfileTitle.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="RewardsAndAirdropsPage.xaml">
+	  <MauiXaml Update="AirdropsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="RewardsAndCompetitionsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="TransferPage.xaml">

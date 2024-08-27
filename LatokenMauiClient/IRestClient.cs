@@ -24,6 +24,8 @@ namespace LatokenMauiClient
         TradingCompetition GetTradingCompetition(string competitionId);
 
         IEnumerable<TradingCompetition> GetAllTradingCompetitions(int page = 0, int size = 10);
+        
+        IEnumerable<Airdrop> GetAirdrops();
 
         IEnumerable<TradingCompetitionLeaderBoardPosition> GetTradingCompetitionLeaderBoard(string competitionId, int page = 0, int size = 100);
 

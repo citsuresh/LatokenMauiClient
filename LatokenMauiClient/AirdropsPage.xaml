@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:LatokenMauiClient"
+             x:Class="LatokenMauiClient.AirdropsPage" Loaded="ContentPage_Loaded">
+    <Shell.TitleView>
+        <local:ProfileTitle></local:ProfileTitle>
+    </Shell.TitleView>
+    <ContentPage.Content>
+        <RefreshView IsRefreshing="{Binding IsRefreshing}" Refreshing="RefreshView_Refreshing">
+            <ScrollView>
+                <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+                    <Button x:Name="RefreshButton" Text="Refresh" Clicked="RefreshButton_Clicked" />
+                    <!--<ActivityIndicator x:Name="BusyIndicator"  IsRunning="True" />-->
+                    <Label
+                Text="Airdrops"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" />
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                        <Label
+                        Text="for the last"
+                        Margin="10,0,10,0"
+                        Style="{StaticResource SubHeadline}"
+                        SemanticProperties.HeadingLevel="Level2" />
+                        <Editor WidthRequest="60"
+                            HorizontalTextAlignment="Center"
+                            Text="{Binding RewardDuration}"
+                            IsEnabled="{Binding IsRewardDurationEditable}"
+                            FontSize="16"
+                            FontAttributes="Bold"/>
+                        <Label
+                        Text="days"
+                        Margin="10,0,10,0"
+                        Style="{StaticResource SubHeadline}"
+                        SemanticProperties.HeadingLevel="Level2" />
+                    </StackLayout>
+
+                    <Border>
+
+                        <Grid x:Name="AirdropsGrid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0"
+                         Grid.Column="0"
+                         Text=" Airdrop Symbol"
+                         x:Name="AirdropSymbolColumnHeader"
+                         Padding="4"
+                         FontAttributes="Bold"/>
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </ContentPage.Content>
+</ContentPage>

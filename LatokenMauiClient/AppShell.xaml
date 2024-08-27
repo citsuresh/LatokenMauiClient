@@ -30,6 +30,11 @@
                Route="rewardsAndAirdrops" 
                ContentTemplate="{DataTemplate local:RewardsAndAirdropsPage}" />
         </Tab>
+        <Tab Title="Airdrops" Icon="airdrop.svg">
+            <ShellContent Title="Airdrops" 
+               Route="airdrops" 
+               ContentTemplate="{DataTemplate local:AirdropsPage}" />
+        </Tab>
         <Tab Title="Assets" Icon="assets.svg">
             <ShellContent Title="Spot Balances" 
               Route="spot" 

@@ -92,8 +92,12 @@ namespace LatokenMauiClient
             var tradingCompetitions = ClientInstance.GetAllTradingCompetitions(page, size).Result;
             return tradingCompetitions;
         }
-
-
+        
+        public IEnumerable<Airdrop> GetAirdrops()
+        {
+            var airdrops = ClientInstance.GetActiveAirdrops().Result;
+            return airdrops;
+        }
 
         public IEnumerable<TradingCompetitionLeaderBoardPosition> GetTradingCompetitionLeaderBoard(string competitionId, int page = 0, int size = 100)
         {

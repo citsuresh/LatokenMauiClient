@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.OS;
 using AndroidX.Core.App;
+using Latoken.Api.Client.Library;
 using System;
 using Uri = Android.Net.Uri;
 
@@ -219,6 +220,23 @@ namespace LatokenMauiClient.Platforms.Android
                         endingCompetitionsNotificationMessage = "Ending Trading Competitions : \n" + string.Join(",\n", endingTradingCompetitions.Select(c => c.Name + " - " + c.EndDate.ToLocalTime().ToShortDateString() + " " + c.EndDate.ToLocalTime().ToLongTimeString()));
                     }
 
+                    var airdrops = this.GetAirdrops();
+
+                    var previouslyUpdatedAirdropData = Preferences.Default.Get<string>("LastUpdatedAirdropData", string.Empty);
+                    LastUpdatedAirdrops lastUpdatedAirdrops = new LastUpdatedAirdrops();
+                    lastUpdatedAirdrops.DeSerialize(previouslyUpdatedAirdropData);
+
+                    var totalNewAirdrops = 0;
+                    var newAirdrops = airdrops.Where(a => !lastUpdatedAirdrops.LastUpdatedAirdropData.Contains(a.Ticker));
+
+                    var newAirdropsNotificationMessage = string.Empty;
+                    if (newAirdrops.Any())
+                    {
+                        totalNewAirdrops = newAirdrops.Count();
+                        newAirdropsNotificationMessage = "\nNew Airdrops : " + string.Join(", ", newAirdrops.Select(c => c.Ticker));
+                    }
+                    newCompetitionsNotificationMessage += newAirdropsNotificationMessage;
+
                     var profiles = this.GetProfiles();
 
                     List<Task<(Profile, IEnumerable<TransferDto>)>> tasks = new List<Task<(Profile, IEnumerable<TransferDto>)>>();
@@ -295,8 +313,8 @@ namespace LatokenMauiClient.Platforms.Android
                         && string.IsNullOrEmpty(endingCompetitionsNotificationMessage)
                         && string.IsNullOrEmpty(bitMartMessage))
                     {
-                        string message = $"Checked rewards and competitions {counter} times\nNo new Rewards and Competitions since you last checked!";
-                        var notification = CreateUpdatedNotification(NormalNotificationChannelId, $"Running in the background. {bitMartMessage} No New Rewards and Competitions!", message);
+                        string message = $"Checked rewards, competitions & airdrops {counter} times\nNo new Rewards, Competitions & Airdrops since you last checked!";
+                        var notification = CreateUpdatedNotification(NormalNotificationChannelId, $"Running in the background. {bitMartMessage} No New Rewards, Competitions & Airdrops!", message);
                         StartForeground(ServiceNotificationId, notification);
                     }
                     else
@@ -313,8 +331,17 @@ namespace LatokenMauiClient.Platforms.Android
                         {
                             // Display a notification
                             string message = $"Checked rewards and competitions {counter} times\n{bitMartMessage}{newCompetitionsNotificationMessage}";
-                            var notification = CreateUpdatedNotification(NewTradingCompetitionsNotificationChannelId, $"Running in the background. {bitMartMessage}{totalNewCompetitions} New Competitions!\"", message);
-                            StartForeground(ServiceNotificationId, notification);
+                            if (totalNewCompetitions > 0)
+                            {
+                                var notification = CreateUpdatedNotification(NewTradingCompetitionsNotificationChannelId, $"Running in the background. {bitMartMessage}{totalNewCompetitions} New Competitions, {totalNewAirdrops} New Airdrops!\"", message);
+                                StartForeground(ServiceNotificationId, notification);
+                            }
+                            else
+                            {
+                                var notification = CreateUpdatedNotification(NewTradingCompetitionsNotificationChannelId, $"Running in the background. {bitMartMessage}{totalNewAirdrops} New Airdrops!\"", message);
+                                StartForeground(ServiceNotificationId, notification);
+                            }
+
                         }
 
                         if (!string.IsNullOrEmpty(endingCompetitionsNotificationMessage))
@@ -363,6 +390,14 @@ namespace LatokenMauiClient.Platforms.Android
             vm.InitializeProfileAndRestClient();
             var competitions = vm.GetTradingCompetitions();
             return competitions;
+        }
+
+        private IEnumerable<Airdrop> GetAirdrops()
+        {
+            var vm = new AirdropsViewModel(this.currencyCache);
+            vm.InitializeProfileAndRestClient();
+            var airdrops = vm.GetAirdrops();
+            return airdrops;
         }
 
         private (Profile, IEnumerable<TransferDto>) GetProfileRewards(Profile profile)

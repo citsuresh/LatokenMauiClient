@@ -41,6 +41,8 @@ namespace LatokenMauiClient
             builder.Services.AddTransient<TradingCompetitionsViewModel>();
             builder.Services.AddTransient<RewardsAndAirdropsPage>();
             builder.Services.AddTransient<RewardsAndAirdropsViewModel>();
+            builder.Services.AddTransient<AirdropsPage>();
+            builder.Services.AddTransient<AirdropsViewModel>();
             builder.Services.AddTransient<SellPage>();
             builder.Services.AddTransient<SellViewModel>();
             builder.Services.AddTransient<TransferPage>();
