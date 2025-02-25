@@ -187,7 +187,7 @@ namespace LatokenMauiClient.Platforms.Android
 
 
         private void CheckForNewRewardsAndCompetitions(object? state)
-        {
+         {
             if (!cancellationTokenSource.IsCancellationRequested)
             {
                 try
@@ -211,7 +211,7 @@ namespace LatokenMauiClient.Platforms.Android
 
                     var totalEndingCompetitions = 0;
                     //Select the trading competitions which will within 2 hours
-                    var endingTradingCompetitions = tradingCompetitions.Where(comp => comp.EndDate.ToLocalTime().AddHours(-2) <= DateTime.Now);
+                    var endingTradingCompetitions = tradingCompetitions.Where(comp => comp.EndDate.ToLocalTime().AddHours(-2) <= DateTime.Now && comp.EndDate.ToLocalTime().AddHours(-2) >= DateTime.Now.AddDays(-1));
 
                     var endingCompetitionsNotificationMessage = string.Empty;
                     if (endingTradingCompetitions.Any())
